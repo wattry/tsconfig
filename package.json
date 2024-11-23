@@ -23,6 +23,7 @@
     "build:tsc-cjs": "tsc -p tsconfig.cjs.json",
     "build:tsc-esm": "tsc -p tsconfig.esm.json",
     "build:tsc-types": "tsc -p tsconfig.types.json",
+    "ci": "pnpm build",
     "pack:build": "pnpm build && pnpm pack",
     "start": "node --no-warnings=ExperimentalWarning --loader ts-node/esm ./src/index.ts",
     "start:cjs": "node ./dist/cjs/index.cjs",

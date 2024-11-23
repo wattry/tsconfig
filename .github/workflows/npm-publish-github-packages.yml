@@ -7,7 +7,7 @@ on:
   release:
     types: [created]
 
-  publish-gpr:
+  build:
     runs-on: ubuntu-latest
     permissions:
       contents: read

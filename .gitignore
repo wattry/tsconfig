@@ -1,0 +1,31 @@
+# Logs
+logs
+*.log
+
+# Coverage directory used by tools like jest
+coverage
+
+# Compiled binary addons (http://nodejs.org/api/addons.html)
+build/Release
+
+# Dependency directory
+# https://docs.npmjs.com/cli/shrinkwrap#caveats
+.DS_Store
+node_modules
+.idea
+.terraform
+
+# Debug log from npm
+npm-debug.log
+
+# app specific file
+*.jwt
+*.properties
+*.pem
+*.key
+.terraform
+
+junit.xml
+coverage
+dist
+*.tgz

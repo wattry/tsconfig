@@ -3,8 +3,6 @@
   "exclude": ["dist", "node_modules"],
   "compilerOptions": {
     /* Visit https://aka.ms/tsconfig to read more about this file */
-
-    // these came from https://github.com/tsconfig/bases?tab=readme-ov-file#centralized-recommendations-for-tsconfig-bases
     /* Projects */
     "incremental": true, /* Save .tsbuildinfo files to allow for incremental compilation of projects. */
     "tsBuildInfoFile": "./.tsbuildinfo", /* Specify the path to .tsbuildinfo incremental compilation file. */

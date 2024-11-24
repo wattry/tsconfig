@@ -1,18 +1,21 @@
-import globals from 'globals'
 import eslint from '@eslint/js';
-import tseslint from 'typescript-eslint';
-
-import nodePlugin from 'eslint-plugin-n';
 import stylistic from '@stylistic/eslint-plugin';
+import globals from 'globals';
+import tseslint from 'typescript-eslint';
 import jestPlugin from 'eslint-plugin-jest';
 
+const files = ['src/**/*.ts', 'types/**/*.ts'];
+const ignores = ['dist/**/*', 'node_modules/**/*'];
+
 const config = tseslint.config(
-  eslint.configs.recommended,
   jestPlugin.configs['flat/recommended'],
-  nodePlugin.configs['flat/recommended'],
-  { ignores: ['dist', 'node_modules'] },
-  { files: ['src'] },
+  jestPlugin.configs['flat/style'],
+  eslint.configs.recommended,
+  tseslint.configs.recommended,
+  { files, ignores },
   {
+    files,
+    ignores,
     languageOptions: {
       ecmaVersion: 'latest',
       sourceType: 'module',
@@ -23,7 +26,6 @@ const config = tseslint.config(
       },
     },
     plugins: {
-      'jest': jestPlugin,
       '@stylistic': stylistic
     },
     rules: {
@@ -42,19 +44,19 @@ const config = tseslint.config(
       '@stylistic/member-delimiter-style': [
         'error',
         {
-          'multiline': {
-            'delimiter': 'comma',
-            'requireLast': true
+          multiline: {
+            delimiter: 'comma',
+            requireLast: true
           },
-          'singleline': {
-            'delimiter': 'comma',
-            'requireLast': true
+          singleline: {
+            delimiter: 'comma',
+            requireLast: true
           },
-          'overrides': {
-            'interface': {
-              'multiline': {
-                'delimiter': 'semi',
-                'requireLast': true
+          overrides: {
+            interface: {
+              multiline: {
+                delimiter: 'semi',
+                requireLast: true
               }
             }
           },
@@ -63,7 +65,7 @@ const config = tseslint.config(
       ],
       '@stylistic/object-curly-newline': ['error', { consistent: true }],
       '@stylistic/object-curly-spacing': ['error', 'always'],
-      '@stylistic/prefer-for-of': ['off'],
+      '@stylistic/prefer-for-of': 'off',
       '@stylistic/quotes': ['error', 'single', { avoidEscape: true }],
       '@stylistic/semi': ['error', 'always'],
       '@stylistic/space-before-function-paren': [
@@ -97,17 +99,15 @@ const config = tseslint.config(
       'no-nested-ternary': 'off',
       'no-plusplus': ['error', { allowForLoopAfterthoughts: true }],
       'no-restricted-syntax': ['error', "BinaryExpression[operator='of']"],
-      'no-shadow': ['error', { allow: ['_function'] }],
-      'no-underscore-dangle': ['warn', { allow: ['_function', '_method'] }],
+      'no-shadow': 'error',
+      'no-underscore-dangle': 'warn',
       'no-use-before-define': ['error', 'nofunc'],
       'no-unused-vars': ['warn', { args: 'none' }],
       'no-param-reassign': 'error',
       'prefer-const': 'warn',
       camelcase: 'warn',
       'prefer-destructuring': ['error', { array: false, object: false }],
-      'no-await-in-loop': 'warn',
-      'n/no-missing-import': 'off',
-      'n/hashbang': 'off'
+      'no-await-in-loop': 'warn'
     }
   }
 );

@@ -16,16 +16,17 @@ export interface BasePkgJson {
   devDependencies: Record<string, string>;
   scripts: Record<string, string>;
   license: string;
-};
+}
 
 export interface Options {
-  packageManager: typeof choices[number];
+  packageManager: (typeof choices)[number];
   cjs: boolean;
-};
+}
+
 export type PkgJson = Partial<BasePkgJson>;
 
 export default {
   baseDir,
   tsConfigPath,
-  choices
+  choices,
 };

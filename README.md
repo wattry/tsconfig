@@ -2,7 +2,6 @@
 
 This is an example project that defines how to setup a TS project to export both CS and ESM type modules along with the corresponding TS.
 
-
 Start initialize a new npm project as follows replacing '<ts-module>' with your module name.
 
 ```shell
@@ -25,14 +24,25 @@ pnpm publish
 
 If your access token is configured correctly your module and it's typings will be published. If this code is not a public module then you can just execute the code right from the dist folder.
 
+# Maintaining
+
+The central concept of the project is to centralize maintenance of development dependencies for a collection of projects. Hence ensuring this is upgraded and
+updated in order to keep versions in step.
+
+```sh
+pnpm upgrade:all
+```
+
 # Contributing
 
 ## Install
+
 ```shell
 pnpm install -g .
 ```
 
 ## Build
+
 This will output a dist directory that will contain a cjs, mjs and types directories respectively.
 In the importing project you'll need to specify the type property in the package.json. Either "commonjs" or "module".
 When you install this module the project will reference the correct source based on this flag.
@@ -52,11 +62,10 @@ common-js.cjs
 
 ```cjs
 export async function test(abc, zyx) {
-  const esModule = await import('esm-js.mjs');
+  const esModule = await import("esm-js.mjs");
 
   const result = esModule.myFunction(abc, zyx);
 }
-
 ```
 
 The same is true for esm projects.
@@ -65,7 +74,7 @@ esm-cjs.mjs
 
 ```mjs
 async function test() {
-  const cjsModule = await import('common-js.cjs');
+  const cjsModule = await import("common-js.cjs");
 
   const result = cjsModule.test(abc, zyx);
 }
@@ -80,6 +89,7 @@ pnpm build
 ## Run
 
 ### TS
+
 This uses ts-node to run the TS on the fly.
 
 ```shell
@@ -87,6 +97,7 @@ pnpm start
 ```
 
 ### CJS
+
 This will use node to execute the dist/cjs/index.js
 
 ```shell
@@ -94,6 +105,7 @@ pnpm start:cjs
 ```
 
 ### ESM
+
 This will use node to execute the dist/esm/index.mjs
 
 ```shell

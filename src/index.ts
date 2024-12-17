@@ -9,7 +9,9 @@ import { tsConfigPath, choices } from './types.ts';
 import { BasePkgJson, PkgJson, Options } from './types.ts';
 
 const program = new Command();
-const basePkgJsonString = fs.readFileSync(`${tsConfigPath}/package.json`, files.encoding).toString();
+const basePkgJsonString = fs
+  .readFileSync(`${tsConfigPath}/package.json`, files.encoding)
+  .toString();
 const basePkgJson: BasePkgJson = JSON.parse(basePkgJsonString);
 
 program
@@ -17,8 +19,14 @@ program
   .description(basePkgJson.description)
   .version(basePkgJson.version);
 
-const pmOption = new Option('-p, --package-manager <string>', 'Set a package manager to manage dependencies');
-const cjsOption = new Option('-c, --cjs', 'Include cjs typescript build configuration for dual builds');
+const pmOption = new Option(
+  '-p, --package-manager <string>',
+  'Set a package manager to manage dependencies',
+);
+const cjsOption = new Option(
+  '-c, --cjs',
+  'Include cjs typescript build configuration for dual builds',
+);
 
 pmOption.default(choices[0]);
 pmOption.choices(choices);
@@ -32,8 +40,6 @@ program
     console.info('Using options:', options);
 
     const { packageManager, cjs } = options;
-    // Install required dev dependencies
-    dependencies.installDev(basePkgJson, packageManager);
     // Make src & types directories
     files.mkDirectories('src');
     files.mkDirectories('types');
@@ -43,6 +49,8 @@ program
     files.readConfigs(basePkgJson, cjs, configs);
     files.configurePkgJson(basePkgJson, cjs, configs);
     files.writeConfigs(configs);
+    // Install required dev dependencies
+    dependencies.installDev(basePkgJson, packageManager);
 
     console.info('Initialized configuration');
   });
@@ -56,7 +64,9 @@ program
 
     const { packageManager } = options;
     const removePkgJson = `${process.env.PWD}/package.json`;
-    const pkgJsonString = fs.readFileSync(removePkgJson, files.encoding).toString();
+    const pkgJsonString = fs
+      .readFileSync(removePkgJson, files.encoding)
+      .toString();
     const pkgJson: PkgJson = JSON.parse(pkgJsonString);
 
     dependencies.uninstallDev(basePkgJson, packageManager);

@@ -21,7 +21,7 @@
     "build:esm": "tsup src --tsconfig ./tsconfig.json --format esm -d dist --sourcemap inline --dts",
     "build:cjs": "tsup src --tsconfig ./tsconfig.cjs.json --format cjs -d dist --cjsInterop --splitting",
     "build:pack": "pnpm build && pnpm pack",
-    "dev": "node --loader ts-node/esm --watch=./src --env-file=./.env ./src/index.ts",
+    "dev": "node --loader ts-node/esm --watch=./src ./src/index.ts",
     "start": "node ./dist/esm/index.js",
     "start:cjs": "node ./dist/cjs/index.cjs",
     "clean": "rm -rf node_module dist",

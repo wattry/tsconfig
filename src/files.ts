@@ -25,19 +25,22 @@ export function configurePkgJson(
   newPkgJson.types = './dist/index.d.ts';
   newPkgJson.module = './dist/index.js';
 
+  newPkgJson.scripts = { ...(pkgJson.scripts ?? {}), ...basePkgJson.scripts };
+
   if (cjs) {
     newPkgJson.main = './dist/index.cjs';
+    newPkgJson.scripts.build = "concurrently 'rm -rf ./dist' 'pnpm:build:cjs' 'pnpm:build:esm' 'pnpm:build:types'";
     newPkgJson.exports = {
       types: './dist/index.d.ts',
       import: './dist/index.js',
       require: './dist/index.cjs',
     };
   } else {
+    newPkgJson.scripts.build = "concurrently 'rm -rf ./dist' 'pnpm:build:esm' 'pnpm:build:types'";
     if (newPkgJson?.main) {
       delete newPkgJson.main;
     }
   }
-  newPkgJson.scripts = { ...(pkgJson.scripts ?? {}), ...basePkgJson.scripts };
   newPkgJson.license = 'Apache-2.0';
 
   configs.set('package.json', JSON.stringify(newPkgJson, null, 2));

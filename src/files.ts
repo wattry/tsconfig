@@ -15,7 +15,7 @@ export function configurePkgJson(
   const pkgJson: PkgJson = JSON.parse(
     fs.readFileSync(`${process.env.PWD}/package.json`, encoding).toString(),
   );
-  const newPkgJson: PkgJson = { ...pkgJson };
+  const newPkgJson: PkgJson = JSON.parse(JSON.stringify(pkgJson));
 
   if (!pkgJson.name) {
     throw new ReferenceError('package.json requires a name');
@@ -37,6 +37,7 @@ export function configurePkgJson(
     };
   } else {
     newPkgJson.scripts.build = "concurrently 'rm -rf ./dist' 'pnpm:build:esm' 'pnpm:build:types'";
+
     if (newPkgJson?.main) {
       delete newPkgJson.main;
     }

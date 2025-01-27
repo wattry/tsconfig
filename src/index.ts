@@ -51,7 +51,10 @@ program
     // Install required dev dependencies
     dependencies.installDev(basePkgJson, packageManager);
 
+    console.log('Initializing husky');
     childProcess.execSync('pnpm husky init');
+    console.log('Initialized husky');
+
     console.info('Initialized configuration');
   });
 
@@ -77,9 +80,14 @@ program
     delete pkgJson.types;
     delete pkgJson.exports;
     delete pkgJson.type;
-    delete pkgJson.scripts;
     delete pkgJson.files;
     delete pkgJson.license;
+
+    for (const script of Object.keys(basePkgJson.scripts)) {
+      if (pkgJson.scripts?.[script]) {
+        delete pkgJson.scripts?.[script];
+      }
+    }
 
     if (pkgJson.devDependencies) {
       Object.keys(pkgJson.devDependencies).forEach((pkg: string) => {
@@ -90,6 +98,10 @@ program
     }
 
     fs.writeFileSync(removePkgJson, JSON.stringify(pkgJson, null, 2));
+    console.log('Removing .husky');
+    fs.rmdirSync(`${process.env.PWD}/.husky`, { recursive: true });
+    console.log('Removed .husky');
+
     console.info('Package reset');
   });
 

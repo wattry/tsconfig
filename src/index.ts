@@ -1,5 +1,6 @@
 import { Command, Option } from 'commander';
 import fs from 'node:fs';
+import childProcess from 'node:child_process';
 
 import files from './files.ts';
 import dependencies from './dependencies.ts';
@@ -50,6 +51,7 @@ program
     // Install required dev dependencies
     dependencies.installDev(basePkgJson, packageManager);
 
+    childProcess.execSync('pnpm husky init');
     console.info('Initialized configuration');
   });
 

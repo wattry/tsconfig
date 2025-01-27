@@ -27,13 +27,13 @@
     "lint": "eslint --no-warn-ignored src/**/*.ts",
     "lint:config": "pnpx @eslint/config-inspector@latest --config ./eslint.config.js",
     "lint:fix": "eslint --fix --no-warn-ignored src/**/*.ts",
-    "prepare": "husky",
     "start": "node ./dist/esm/index.js",
     "start:cjs": "node ./dist/cjs/index.cjs",
     "test": "vitest --run --config ./vitest.config.ts",
     "test:ci": "vitest --run --coverage --passWithNoTests --silent --config ./vitest.config.js",
     "test:watch": "vitest --passWithNoTests --watch --config ./vitest.config.ts",
-    "upgrade:all": "pnpm update --latest"
+    "upgrade:all": "pnpm update --latest",
+    "prepare": "husky"
   },
   "author": "wattry",
   "license": "Apache-2.0",

@@ -29,9 +29,9 @@
     "lint:fix": "eslint --fix --no-warn-ignored src/**/*.ts",
     "start": "node ./dist/esm/index.js",
     "start:cjs": "node ./dist/cjs/index.cjs",
-    "test": "vitest --run --config ./vitest.config.ts",
+    "test": "vitest --run --config ./vitest.config.js",
     "test:ci": "vitest --run --coverage --passWithNoTests --silent --config ./vitest.config.js",
-    "test:watch": "vitest --passWithNoTests --watch --config ./vitest.config.ts",
+    "test:watch": "vitest --passWithNoTests --watch --config ./vitest.config.js",
     "upgrade:all": "pnpm update --latest",
     "prepare": "husky"
   },

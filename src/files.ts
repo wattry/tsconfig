@@ -56,18 +56,18 @@ export function readConfigs(
   console.info('Reading configs');
   for (const config of basePkgJson.files) {
     if (
-      !(config === 'dist/**/*') &&
-      !cjs &&
-      !(config === 'tsconfig.cjs.json')
+      !(config === 'dist/**/*')
     ) {
-      try {
-        const file = fs
-          .readFileSync(`${tsConfigPath}/${config}`, encoding)
-          .toString();
+      if ((cjs && config === 'tsconfig.cjs.json') || !(config === 'tsconfig.cjs.json')) {
+        try {
+          const file = fs
+            .readFileSync(`${tsConfigPath}/${config}`, encoding)
+            .toString();
 
-        configs.set(config, file);
-      } catch (error: unknown) {
-        console.error((error as Error).message);
+          configs.set(config, file);
+        } catch (error: unknown) {
+          console.error((error as Error).message);
+        }
       }
     }
   }

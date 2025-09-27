@@ -1,5 +1,5 @@
 export const baseDir = 'node_modules/@wattry/tsconfig' as const;
-export const tsConfigPath = `${process.env.PWD}/${baseDir}` as const;
+export const tsConfigPath = `${process.env?.['PWD']}/${baseDir}` as const;
 export const choices = ['pnpm', 'npm', 'yarn'] as const;
 export type ConfigMap = Map<string, string>;
 

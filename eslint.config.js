@@ -1,15 +1,13 @@
 import eslint from '@eslint/js';
+import { defineConfig } from 'eslint/config';
 import stylistic from '@stylistic/eslint-plugin';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
-import jestPlugin from 'eslint-plugin-jest';
 
 const files = ['src/**/*.ts', 'types/**/*.ts'];
 const ignores = ['dist/**/*', 'node_modules/**/*'];
 
-const config = tseslint.config(
-  jestPlugin.configs['flat/recommended'],
-  jestPlugin.configs['flat/style'],
+export default defineConfig(
   eslint.configs.recommended,
   tseslint.configs.recommended,
   { files, ignores },
@@ -40,7 +38,7 @@ const config = tseslint.config(
         },
       ],
       '@stylistic/brace-style': ['error', '1tbs', { allowSingleLine: true }],
-      '@stylistic/func-call-spacing': ['error', 'never'],
+      '@stylistic/function-call-spacing': ['error', 'never'],
       '@stylistic/function-call-argument-newline': 'off',
       '@stylistic/object-curly-newline': ['error', { consistent: true }],
       '@stylistic/object-curly-spacing': ['error', 'always'],
@@ -82,21 +80,19 @@ const config = tseslint.config(
         { overrides: { '=': 'after', '?': 'before', ':': 'before' } },
       ],
       '@stylistic/arrow-parens': ['error', 'always'],
+      'camelcase': 'warn',
       'consistent-return': 'off',
+      'no-await-in-loop': 'warn',
       'no-nested-ternary': 'off',
+      'no-param-reassign': 'error',
       'no-plusplus': ['error', { allowForLoopAfterthoughts: true }],
       'no-restricted-syntax': ['error', "BinaryExpression[operator='of']"],
       'no-shadow': 'error',
       'no-underscore-dangle': 'warn',
-      'no-use-before-define': ['error', 'nofunc'],
       'no-unused-vars': ['warn', { args: 'none' }],
-      'no-param-reassign': 'error',
+      'no-use-before-define': ['error', 'nofunc'],
       'prefer-const': 'warn',
-      'camelcase': 'warn',
       'prefer-destructuring': ['error', { array: false, object: false }],
-      'no-await-in-loop': 'warn',
     },
   },
 );
-
-export default config;

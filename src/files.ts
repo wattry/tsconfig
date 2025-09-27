@@ -13,7 +13,7 @@ export function configurePkgJson(
   console.info('Configure package.json');
 
   const pkgJson: PkgJson = JSON.parse(
-    fs.readFileSync(`${process.env.PWD}/package.json`, encoding).toString(),
+    fs.readFileSync(`${process.env?.['PWD']}/package.json`, encoding).toString(),
   );
   const newPkgJson: PkgJson = { ...pkgJson };
 
@@ -75,7 +75,7 @@ export function writeConfigs(configs: ConfigMap) {
   for (const [config, file] of configs.entries()) {
     try {
       console.debug('Writing:', config);
-      fs.writeFileSync(`${process.env.PWD}/${config}`, file);
+      fs.writeFileSync(`${process.env?.['PWD']}/${config}`, file);
       console.debug('Wrote:', config);
     } catch (error: unknown) {
       console.error((error as Error).message);
@@ -86,7 +86,7 @@ export function writeConfigs(configs: ConfigMap) {
 
 export function mkDirectories(name: string) {
   try {
-    fs.mkdirSync(`${process.env.PWD}/${name}`);
+    fs.mkdirSync(`${process.env?.['PWD']}/${name}`);
   } catch (error: unknown) {
     console.error((error as Error).message);
   }
@@ -96,7 +96,7 @@ export function rmConfigs(basePkgJson: BasePkgJson) {
   console.info('Removing configs');
   for (const config of basePkgJson.files) {
     try {
-      fs.rmSync(`${process.env.PWD}/${config}`, rmOptions);
+      fs.rmSync(`${process.env?.['PWD']}/${config}`, rmOptions);
     } catch (error: unknown) {
       console.error((error as Error).message);
     }

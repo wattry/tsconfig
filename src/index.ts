@@ -63,7 +63,7 @@ program
     console.info('Using options:', options);
 
     const { packageManager } = options;
-    const removePkgJson = `${process.env.PWD}/package.json`;
+    const removePkgJson = `${process.env?.['PWD']}/package.json`;
     const pkgJsonString = fs
       .readFileSync(removePkgJson, files.encoding)
       .toString();

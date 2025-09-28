@@ -34,7 +34,7 @@
   "license": "Apache-2.0",
   "name": "@wattry/tsconfig",
   "scripts": {
-    "build": "tsc --pretty --esm --project ./tsconfig.json",
+    "build": "tsc --pretty --project ./tsconfig.json",
     "build:pack": "pnpm build && pnpm pack",
     "clean": "rm -rf node_module dist",
     "dev": "node --no-warnings --loader ts-node/esm --watch=./src ./src/index.ts",

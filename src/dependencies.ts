@@ -1,6 +1,7 @@
 import child from 'node:child_process';
 
-import { Options, BasePkgJson } from './types.ts';
+import { logger } from './logger.js';
+import { Options, BasePkgJson } from './types.js';
 
 export function installDev(
   basePkgJson: BasePkgJson,
@@ -13,9 +14,9 @@ export function installDev(
     .join(' ');
   const installCMD = `${packageManager} ${installCmd} ${packages}`;
 
-  console.info('Installing dev dependencies:', installCMD);
+  logger.info('Installing dev dependencies:', installCMD);
   child.execSync(installCMD);
-  console.info('Installed dev dependencies');
+  logger.info('Installed dev dependencies');
 }
 
 export function uninstallDev(
@@ -31,11 +32,11 @@ export function uninstallDev(
     );
     const uninstallCMD = `${packageManager} ${uninstallCmd} ${packages.join(' ')}`;
 
-    console.info('Removing dependencies:', uninstallCMD);
+    logger.info('Removing dependencies:', uninstallCMD);
     child.execSync(uninstallCMD);
-    console.info('Removed dependencies');
+    logger.info('Removed dependencies');
   } catch (error: unknown) {
-    console.warn((error as Error).message);
+    logger.warn((error as Error).message);
   }
 }
 

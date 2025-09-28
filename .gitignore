@@ -2,7 +2,7 @@
 logs
 *.log
 
-# Coverage directory used by tools like jest
+# Coverage directory used by tools
 coverage
 
 # Compiled binary addons (http://nodejs.org/api/addons.html)
@@ -28,5 +28,6 @@ npm-debug.log
 junit.xml
 coverage
 dist
+build
 *.tgz
 .vscode

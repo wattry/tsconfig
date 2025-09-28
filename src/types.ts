@@ -20,13 +20,25 @@ export interface BasePkgJson {
 
 export interface Options {
   packageManager: (typeof choices)[number];
-  cjs: boolean;
+  debug: boolean;
+  verbose: boolean;
 }
 
 export type PkgJson = Partial<BasePkgJson>;
+
+export enum LogLevel {
+  error,
+  warn,
+  info,
+  debug,
+  trace
+}
+
+export type LogLevelOption = keyof typeof LogLevel;
 
 export default {
   baseDir,
   tsConfigPath,
   choices,
+  LogLevel
 };

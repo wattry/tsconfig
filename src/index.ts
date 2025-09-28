@@ -3,10 +3,11 @@
 import { Command, Option } from 'commander';
 import fs from 'node:fs';
 
-import files from './files.ts';
-import dependencies from './dependencies.ts';
-import { tsConfigPath, choices } from './types.ts';
-import { BasePkgJson, PkgJson, Options } from './types.ts';
+import { Logger } from './logger.js';
+import files from './files.js';
+import dependencies from './dependencies.js';
+import { tsConfigPath, choices, LogLevelOption } from './types.js';
+import { BasePkgJson, PkgJson, Options } from './types.js';
 
 const program = new Command();
 const basePkgJsonString = fs
@@ -23,9 +24,15 @@ const pmOption = new Option(
   '-p, --package-manager <string>',
   'Set a package manager to manage dependencies',
 );
-const cjsOption = new Option(
-  '-c, --cjs',
-  'Include cjs typescript build configuration for dual builds',
+
+const debug = new Option(
+  '-d, --debug',
+  'Log level debug',
+);
+
+const verbose = new Option(
+  '--verbose',
+  'Log level verbose',
 );
 
 pmOption.default(choices[0]);
@@ -35,32 +42,50 @@ program
   .command('init')
   .description('Initialize a ts project with the base config for a specific NodeJS version')
   .addOption(pmOption)
-  .addOption(cjsOption)
+  .addOption(debug)
+  .addOption(verbose)
   .action(function (options: Options) {
-    console.info('Using options:', options);
+    const level = options?.debug
+      ? 'debug'
+      : options?.verbose
+        ? 'verbose'
+        : 'info';
 
-    const { packageManager, cjs } = options;
+    const logger = Logger(level as LogLevelOption);
+    logger.debug('Using options:', options);
+
+    const { packageManager } = options;
     // Make src & types directories
     files.mkDirectories('src');
     files.mkDirectories('types');
 
     const configs = new Map<string, string>();
     // Copy config files into project
-    files.readConfigs(basePkgJson, cjs, configs);
-    files.configurePkgJson(basePkgJson, cjs, configs);
+    files.readConfigs(basePkgJson, configs);
+    files.configurePkgJson(basePkgJson, configs);
     files.writeConfigs(configs);
     // Install required dev dependencies
     dependencies.installDev(basePkgJson, packageManager);
 
-    console.info('Initialized configuration');
+    logger.info('Initialized configuration');
   });
 
 program
   .command('reset')
   .description('Remove the TS configs added by this programs')
   .addOption(pmOption)
+  .addOption(debug)
+  .addOption(verbose)
   .action(function (options: Options) {
-    console.info('Using options:', options);
+    const level = options?.debug
+      ? 'debug'
+      : options?.verbose
+        ? 'verbose'
+        : 'info';
+
+    const logger = Logger(level as LogLevelOption);
+
+    logger.info('Using options:', options);
 
     const { packageManager } = options;
     const removePkgJson = `${process.env?.['PWD']}/package.json`;
@@ -90,7 +115,7 @@ program
     }
 
     fs.writeFileSync(removePkgJson, JSON.stringify(pkgJson, null, 2));
-    console.info('Package reset');
+    logger.info('Package reset');
   });
 
 program.parse();

@@ -10,13 +10,21 @@ export interface InspectResult {
   vitest: TextLineDiff[];
 }
 
+function readOrEmpty(filePath: string): string {
+  try {
+    return fs.readFileSync(filePath, encoding).toString();
+  } catch {
+    return '';
+  }
+}
+
 export function inspectConfigs(manifest: Manifest, packageDir: string): InspectResult {
   const currentTsConfig = JSON.parse(
     fs.readFileSync(path.join(packageDir, 'tsconfig.json'), encoding).toString()
   ) as { compilerOptions?: Record<string, unknown> };
 
-  const currentEslint = fs.readFileSync(path.join(packageDir, 'eslint.config.js'), encoding).toString();
-  const currentVitest = fs.readFileSync(path.join(packageDir, 'vitest.config.js'), encoding).toString();
+  const currentEslint = readOrEmpty(path.join(packageDir, 'eslint.config.js'));
+  const currentVitest = readOrEmpty(path.join(packageDir, 'vitest.config.js'));
 
   return {
     tsconfig: diffCompilerOptions(

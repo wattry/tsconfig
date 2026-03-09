@@ -89,4 +89,14 @@ describe('formatInspectResult', () => {
     expect(output).toContain('compilerOptions.jsx');
     expect(output).toContain('Next.js');
   });
+
+  it('shows both diffs and overrides when both present', () => {
+    const output = formatInspectResult(
+      { tsconfig: [{ type: 'added', key: 'verbatimModuleSyntax', value: true }], eslint: [], vitest: [] },
+      [{ config: 'tsconfig', key: 'compilerOptions.jsx', reason: 'Next.js', addedAt: '2026-03-09' }]
+    );
+    expect(output).toContain('+ compilerOptions.verbatimModuleSyntax');
+    expect(output).toContain('Project overrides');
+    expect(output).toContain('compilerOptions.jsx');
+  });
 });

@@ -36,4 +36,16 @@ describe('diffText', () => {
     const result = diffText('abc', 'abc');
     expect(result).toHaveLength(0);
   });
+
+  it('detects duplicate line added', () => {
+    const result = diffText('a\nb', 'a\nb\nb');
+    expect(result).toContainEqual({ type: 'added', line: 'b' });
+    expect(result.filter((d) => d.type === 'added')).toHaveLength(1);
+  });
+
+  it('detects duplicate line removed', () => {
+    const result = diffText('a\nb\nb', 'a\nb');
+    expect(result).toContainEqual({ type: 'removed', line: 'b' });
+    expect(result.filter((d) => d.type === 'removed')).toHaveLength(1);
+  });
 });

@@ -30,15 +30,27 @@ export function diffCompilerOptions(
 export function diffText(before: string, after: string): TextLineDiff[] {
   if (before === after) return [];
 
-  const beforeLines = new Set(before.split('\n'));
-  const afterLines = new Set(after.split('\n'));
   const diffs: TextLineDiff[] = [];
 
-  for (const line of beforeLines) {
-    if (!afterLines.has(line)) diffs.push({ type: 'removed', line });
-  }
-  for (const line of afterLines) {
-    if (!beforeLines.has(line)) diffs.push({ type: 'added', line });
+  const countLines = (text: string): Map<string, number> => {
+    const counts = new Map<string, number>();
+    for (const line of text.split('\n')) {
+      counts.set(line, (counts.get(line) ?? 0) + 1);
+    }
+    return counts;
+  };
+
+  const beforeCounts = countLines(before);
+  const afterCounts = countLines(after);
+  const allLines = new Set([...beforeCounts.keys(), ...afterCounts.keys()]);
+
+  for (const line of allLines) {
+    const bCount = beforeCounts.get(line) ?? 0;
+    const aCount = afterCounts.get(line) ?? 0;
+    const removed = bCount - aCount;
+    const added = aCount - bCount;
+    for (let i = 0; i < removed; i++) diffs.push({ type: 'removed', line });
+    for (let i = 0; i < added; i++) diffs.push({ type: 'added', line });
   }
 
   return diffs;

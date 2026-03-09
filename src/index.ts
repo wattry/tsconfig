@@ -6,8 +6,9 @@ import fs from 'node:fs';
 import { Logger } from './logger.js';
 import files from './files.js';
 import dependencies from './dependencies.js';
+import * as manifest_mod from './manifest.js';
 import { tsConfigPath, choices, LogLevelOption } from './types.js';
-import { BasePkgJson, PkgJson, Options } from './types.js';
+import { BasePkgJson, Options, Snapshots } from './types.js';
 
 const program = new Command();
 const basePkgJsonString = fs
@@ -55,18 +56,39 @@ program
     logger.debug('Using options:', options);
 
     const { packageManager } = options;
+    const projectDir = process.env?.['PWD'] ?? process.cwd();
+
     // Make src & types directories
     files.mkDirectories('src');
     files.mkDirectories('types');
 
-    const projectDir = process.env?.['PWD'] ?? process.cwd();
+    // Write thin wrapper config files
+    files.writeWrappers(projectDir);
+
+    // Merge package.json additively
     const configs = new Map<string, string>();
-    // Copy config files into project
-    files.readConfigs(basePkgJson, configs);
     files.configurePkgJson(projectDir, basePkgJson, configs);
     files.writeConfigs(configs);
+
     // Install required dev dependencies
     dependencies.installDev(basePkgJson, packageManager);
+
+    // Capture base config snapshots from the installed package
+    const tsconfigRaw = fs.readFileSync(`${tsConfigPath}/tsconfig.json`, files.encoding).toString();
+    const tsconfigParsed: { compilerOptions: Record<string, unknown> } = JSON.parse(tsconfigRaw);
+
+    const eslintRaw = fs.readFileSync(`${tsConfigPath}/eslint.config.js`, files.encoding).toString();
+    const vitestRaw = fs.readFileSync(`${tsConfigPath}/vitest.config.js`, files.encoding).toString();
+
+    const snapshots: Snapshots = {
+      tsconfig: { compilerOptions: tsconfigParsed.compilerOptions },
+      eslint: eslintRaw,
+      vitest: vitestRaw,
+    };
+
+    // Create and write the manifest
+    const manifest = manifest_mod.createManifest(basePkgJson.version, snapshots);
+    manifest_mod.writeManifest(projectDir, manifest);
 
     logger.info('Initialized configuration');
   });
@@ -89,33 +111,14 @@ program
     logger.info('Using options:', options);
 
     const { packageManager } = options;
-    const removePkgJson = `${process.env?.['PWD']}/package.json`;
-    const pkgJsonString = fs
-      .readFileSync(removePkgJson, files.encoding)
-      .toString();
-    const pkgJson: PkgJson = JSON.parse(pkgJsonString);
+    const projectDir = process.env?.['PWD'] ?? process.cwd();
 
+    // Uninstall dev dependencies
     dependencies.uninstallDev(basePkgJson, packageManager);
-    files.rmConfigs(basePkgJson);
 
-    delete pkgJson.main;
-    delete pkgJson.module;
-    delete pkgJson.types;
-    delete pkgJson.exports;
-    delete pkgJson.type;
-    delete pkgJson.scripts;
-    delete pkgJson.files;
-    delete pkgJson.license;
+    // Remove wrapper files and manifest
+    files.rmConfigs(projectDir);
 
-    if (pkgJson.devDependencies) {
-      Object.keys(pkgJson.devDependencies).forEach((pkg: string) => {
-        if (pkgJson.devDependencies?.[pkg]) {
-          delete pkgJson.devDependencies[pkg];
-        }
-      });
-    }
-
-    fs.writeFileSync(removePkgJson, JSON.stringify(pkgJson, null, 2));
     logger.info('Package reset');
   });
 

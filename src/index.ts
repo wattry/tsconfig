@@ -6,7 +6,7 @@ import fs from 'node:fs';
 import { Logger } from './logger.js';
 import files from './files.js';
 import dependencies from './dependencies.js';
-import * as manifest_mod from './manifest.js';
+import * as manifestMod from './manifest.js';
 import { tsConfigPath, choices, LogLevelOption } from './types.js';
 import { BasePkgJson, Options, Snapshots } from './types.js';
 
@@ -87,15 +87,15 @@ program
     };
 
     // Create and write the manifest
-    const manifest = manifest_mod.createManifest(basePkgJson.version, snapshots);
-    manifest_mod.writeManifest(projectDir, manifest);
+    const manifest = manifestMod.createManifest(basePkgJson.version, snapshots);
+    manifestMod.writeManifest(projectDir, manifest);
 
     logger.info('Initialized configuration');
   });
 
 program
   .command('reset')
-  .description('Remove the TS configs added by this programs')
+  .description('Remove the TS configs added by this program')
   .addOption(pmOption)
   .addOption(debug)
   .addOption(verbose)
@@ -108,7 +108,7 @@ program
 
     const logger = Logger(level as LogLevelOption);
 
-    logger.info('Using options:', options);
+    logger.debug('Using options:', options);
 
     const { packageManager } = options;
     const projectDir = process.env?.['PWD'] ?? process.cwd();

@@ -40,7 +40,19 @@ export function uninstallDev(
   }
 }
 
+export function updatePackage(
+  packageManager: Options['packageManager'],
+  version: string = 'latest',
+): void {
+  const installCmd = packageManager === 'npm' ? 'install -D' : 'add -D';
+  const cmd = `${packageManager} ${installCmd} @wattry/tsconfig@${version}`;
+  logger.info('Updating @wattry/tsconfig:', cmd);
+  child.execSync(cmd);
+  logger.info('Updated @wattry/tsconfig');
+}
+
 export default {
   installDev,
   uninstallDev,
+  updatePackage,
 };

@@ -37,6 +37,11 @@ const verbose = new Option(
   'Log level verbose',
 );
 
+const targetVersionOption = new Option(
+  '--target-version <string>',
+  'Target version of @wattry/tsconfig to install (default: latest)',
+);
+
 pmOption.default(choices[0]);
 pmOption.choices(choices);
 
@@ -140,6 +145,50 @@ program
     const output = inspectMod.formatInspectResult(result, currentManifest.overrides);
 
     logger.info(output);
+  });
+
+program
+  .command('update')
+  .description('Bump @wattry/tsconfig, reinstall deps, and show config diff')
+  .addOption(pmOption)
+  .addOption(targetVersionOption)
+  .addOption(debug)
+  .addOption(verbose)
+  .action(function (options: Options & { targetVersion?: string }) {
+    const level = options?.debug ? 'debug' : options?.verbose ? 'verbose' : 'info';
+    const logger = Logger(level as LogLevelOption);
+
+    const { packageManager } = options;
+    const projectDir = process.env?.['PWD'] ?? process.cwd();
+
+    // Bump the package
+    dependencies.updatePackage(packageManager, options.targetVersion);
+
+    // Read new base config snapshots from the freshly installed package
+    const newTsConfig = JSON.parse(
+      fs.readFileSync(`${tsConfigPath}/tsconfig.json`, files.encoding).toString()
+    ) as { compilerOptions?: Record<string, unknown>; version?: string };
+    const newEslint = fs.readFileSync(`${tsConfigPath}/eslint.config.js`, files.encoding).toString();
+    const newVitest = fs.readFileSync(`${tsConfigPath}/vitest.config.js`, files.encoding).toString();
+
+    // Show diff before updating the manifest
+    const currentManifest = manifestMod.readManifest(projectDir);
+    const result = inspectMod.inspectConfigs(currentManifest, tsConfigPath);
+    const output = inspectMod.formatInspectResult(result, currentManifest.overrides);
+    logger.info(output);
+
+    // Update manifest with new version and snapshots
+    const updatedManifest = {
+      ...currentManifest,
+      version: options.targetVersion ?? 'latest',
+      snapshots: {
+        tsconfig: { compilerOptions: newTsConfig.compilerOptions ?? {} },
+        eslint: newEslint,
+        vitest: newVitest,
+      },
+    };
+    manifestMod.writeManifest(projectDir, updatedManifest);
+    logger.info('Update complete');
   });
 
 program.parse();

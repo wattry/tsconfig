@@ -59,10 +59,11 @@ program
     files.mkDirectories('src');
     files.mkDirectories('types');
 
+    const projectDir = process.env?.['PWD'] ?? process.cwd();
     const configs = new Map<string, string>();
     // Copy config files into project
     files.readConfigs(basePkgJson, configs);
-    files.configurePkgJson(basePkgJson, configs);
+    files.configurePkgJson(projectDir, basePkgJson, configs);
     files.writeConfigs(configs);
     // Install required dev dependencies
     dependencies.installDev(basePkgJson, packageManager);

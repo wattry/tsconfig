@@ -39,11 +39,11 @@ export function writeWrappers(projectDir: string): void {
   logger.info('Wrote wrapper configs');
 }
 
-export function configurePkgJson(basePkgJson: BasePkgJson, configs: ConfigMap): void {
+export function configurePkgJson(projectDir: string, basePkgJson: BasePkgJson, configs: ConfigMap): void {
   logger.info('Configure package.json');
 
   const pkgJson: PkgJson = JSON.parse(
-    fs.readFileSync(path.join(process.env?.['PWD'] ?? process.cwd(), 'package.json'), encoding).toString(),
+    fs.readFileSync(path.join(projectDir, 'package.json'), encoding).toString(),
   );
 
   if (!pkgJson.name) throw new ReferenceError('package.json requires a name');

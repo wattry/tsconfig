@@ -164,10 +164,14 @@ program
     // Bump the package
     dependencies.updatePackage(packageManager, options.targetVersion);
 
+    const updatedBasePkgJson = JSON.parse(
+      fs.readFileSync(`${tsConfigPath}/package.json`, files.encoding).toString()
+    ) as { version: string };
+
     // Read new base config snapshots from the freshly installed package
     const newTsConfig = JSON.parse(
       fs.readFileSync(`${tsConfigPath}/tsconfig.json`, files.encoding).toString()
-    ) as { compilerOptions?: Record<string, unknown>; version?: string };
+    ) as { compilerOptions?: Record<string, unknown> };
     const newEslint = fs.readFileSync(`${tsConfigPath}/eslint.config.js`, files.encoding).toString();
     const newVitest = fs.readFileSync(`${tsConfigPath}/vitest.config.js`, files.encoding).toString();
 
@@ -180,7 +184,7 @@ program
     // Update manifest with new version and snapshots
     const updatedManifest = {
       ...currentManifest,
-      version: options.targetVersion ?? 'latest',
+      version: updatedBasePkgJson.version,
       snapshots: {
         tsconfig: { compilerOptions: newTsConfig.compilerOptions ?? {} },
         eslint: newEslint,

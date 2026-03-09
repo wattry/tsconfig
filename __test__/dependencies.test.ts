@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import child from 'node:child_process';
 import { updatePackage } from '../src/dependencies.js';
 
@@ -6,6 +6,10 @@ vi.mock('node:child_process');
 vi.mock('../src/logger.js', () => ({
   logger: { info: vi.fn(), debug: vi.fn(), error: vi.fn(), warn: vi.fn() },
 }));
+
+beforeEach(() => {
+  vi.clearAllMocks();
+});
 
 describe('updatePackage', () => {
   it('runs version-pinned install with pnpm', () => {

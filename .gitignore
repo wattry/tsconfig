@@ -31,3 +31,6 @@ dist
 build
 *.tgz
 .vscode
+docs/plans
+.claude
+.worktrees

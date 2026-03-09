@@ -8,6 +8,7 @@ import files from './files.js';
 import dependencies from './dependencies.js';
 import * as manifestMod from './manifest.js';
 import * as inspectMod from './inspect.js';
+import * as overrideMod from './override.js';
 import { tsConfigPath, choices, LogLevelOption } from './types.js';
 import { BasePkgJson, Options, Snapshots } from './types.js';
 
@@ -193,6 +194,57 @@ program
     };
     manifestMod.writeManifest(projectDir, updatedManifest);
     logger.info('Update complete');
+  });
+
+const overrideCmd = program
+  .command('override')
+  .description('Manage project-level config override notes in .ts.config.json');
+
+overrideCmd
+  .command('add <config> <key>')
+  .description('Register an override note (requires --reason)')
+  .requiredOption('--reason <string>', 'Reason for the override')
+  .addOption(debug)
+  .addOption(verbose)
+  .action(function (config: string, key: string, options: { reason: string } & Options) {
+    const level = options?.debug ? 'debug' : options?.verbose ? 'verbose' : 'info';
+    const logger = Logger(level as LogLevelOption);
+
+    const projectDir = process.env?.['PWD'] ?? process.cwd();
+    const currentManifest = manifestMod.readManifest(projectDir);
+    const updated = overrideMod.addOverride(currentManifest, config, key, options.reason);
+    manifestMod.writeManifest(projectDir, updated);
+    logger.info(`Override added: ${config}/${key}`);
+  });
+
+overrideCmd
+  .command('list')
+  .description('List all registered override notes')
+  .addOption(debug)
+  .addOption(verbose)
+  .action(function (options: Options) {
+    const level = options?.debug ? 'debug' : options?.verbose ? 'verbose' : 'info';
+    Logger(level as LogLevelOption);
+
+    const projectDir = process.env?.['PWD'] ?? process.cwd();
+    const currentManifest = manifestMod.readManifest(projectDir);
+    console.log(overrideMod.listOverrides(currentManifest.overrides));
+  });
+
+overrideCmd
+  .command('remove <config> <key>')
+  .description('Remove a registered override note')
+  .addOption(debug)
+  .addOption(verbose)
+  .action(function (config: string, key: string, options: Options) {
+    const level = options?.debug ? 'debug' : options?.verbose ? 'verbose' : 'info';
+    const logger = Logger(level as LogLevelOption);
+
+    const projectDir = process.env?.['PWD'] ?? process.cwd();
+    const currentManifest = manifestMod.readManifest(projectDir);
+    const updated = overrideMod.removeOverride(currentManifest, config, key);
+    manifestMod.writeManifest(projectDir, updated);
+    logger.info(`Override removed: ${config}/${key}`);
   });
 
 program.parse();

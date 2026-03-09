@@ -38,7 +38,7 @@
     "build:pack": "pnpm build && pnpm pack",
     "clean": "rm -rf node_module dist",
     "dev": "node --no-warnings --loader ts-node/esm --watch=./src ./src/index.ts",
-    "lint": "eslint  --config ./eslint.config.js --no-warn-ignored src/**/*.ts",
+    "lint": "eslint --config ./eslint.config.js --no-warn-ignored src/**/*.ts",
     "lint:config": "pnpx @eslint/config-inspector@latest --config ./eslint.config.js",
     "lint:fix": "eslint  --config ./eslint.config.js --fix --no-warn-ignored src/**/*.ts",
     "prepare": "husky",

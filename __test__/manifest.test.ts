@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import fs from 'node:fs';
 import { createManifest, readManifest, writeManifest } from '../src/manifest.js';
 import type { Manifest } from '../src/types.js';
@@ -28,16 +28,19 @@ describe('readManifest', () => {
     vi.mocked(fs.readFileSync).mockImplementation(() => { throw new Error('ENOENT'); });
     expect(() => readManifest('/project')).toThrow('ENOENT');
   });
+
+  it('throws SyntaxError if file contains invalid JSON', () => {
+    vi.mocked(fs.readFileSync).mockReturnValue('not valid json{{{');
+    expect(() => readManifest('/project')).toThrow(SyntaxError);
+  });
 });
 
 describe('writeManifest', () => {
   it('writes manifest as formatted JSON', () => {
     const writeSpy = vi.mocked(fs.writeFileSync);
     writeManifest('/project', baseManifest);
-    expect(writeSpy).toHaveBeenCalledWith(
-      MANIFEST_PATH,
-      JSON.stringify(baseManifest, null, 2),
-    );
+    const expectedJson = '{\n  "version": "1.0.0",\n  "snapshots": {\n    "tsconfig": {\n      "compilerOptions": {\n        "strict": true\n      }\n    },\n    "eslint": "export default [];",\n    "vitest": "export default {};"\n  },\n  "overrides": []\n}';
+    expect(writeSpy).toHaveBeenCalledWith(MANIFEST_PATH, expectedJson);
   });
 });
 

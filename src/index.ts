@@ -224,11 +224,11 @@ overrideCmd
   .addOption(verbose)
   .action(function (options: Options) {
     const level = options?.debug ? 'debug' : options?.verbose ? 'verbose' : 'info';
-    Logger(level as LogLevelOption);
+    const logger = Logger(level as LogLevelOption);
 
     const projectDir = process.env?.['PWD'] ?? process.cwd();
     const currentManifest = manifestMod.readManifest(projectDir);
-    console.log(overrideMod.listOverrides(currentManifest.overrides));
+    logger.info(overrideMod.listOverrides(currentManifest.overrides));
   });
 
 overrideCmd

@@ -3,6 +3,12 @@
   "bin": {
     "tsconfig": "./dist/index.js"
   },
+  "exports": {
+    ".": "./dist/index.js",
+    "./tsconfig.json": "./tsconfig.json",
+    "./eslint.config.js": "./eslint.config.js",
+    "./vitest.config.js": "./vitest.config.js"
+  },
   "dependencies": {
     "commander": "14.0.1"
   },
@@ -23,11 +29,8 @@
     "vitest": "3.2.4"
   },
   "files": [
-    ".env",
-    ".gitignore",
     "dist/**/*",
     "eslint.config.js",
-    "LICENSE",
     "tsconfig.json",
     "vitest.config.js"
   ],

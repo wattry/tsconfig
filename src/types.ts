@@ -36,6 +36,29 @@ export enum LogLevel {
 
 export type LogLevelOption = keyof typeof LogLevel;
 
+export interface Override {
+  config: string;
+  key: string;
+  reason: string;
+  addedAt: string;
+}
+
+export interface TsConfigSnapshot {
+  compilerOptions: Record<string, unknown>;
+}
+
+export interface Snapshots {
+  tsconfig: TsConfigSnapshot;
+  eslint: string;
+  vitest: string;
+}
+
+export interface Manifest {
+  version: string;
+  snapshots: Snapshots;
+  overrides: Override[];
+}
+
 export default {
   baseDir,
   tsConfigPath,

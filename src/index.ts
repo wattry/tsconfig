@@ -7,6 +7,7 @@ import { Logger } from './logger.js';
 import files from './files.js';
 import dependencies from './dependencies.js';
 import * as manifestMod from './manifest.js';
+import * as inspectMod from './inspect.js';
 import { tsConfigPath, choices, LogLevelOption } from './types.js';
 import { BasePkgJson, Options, Snapshots } from './types.js';
 
@@ -120,6 +121,25 @@ program
     files.rmConfigs(projectDir);
 
     logger.info('Package reset');
+  });
+
+program
+  .command('inspect')
+  .description('Show diff between pinned base config version and currently installed version')
+  .addOption(debug)
+  .addOption(verbose)
+  .action(function (options: Options) {
+    const level = options?.debug ? 'debug' : options?.verbose ? 'verbose' : 'info';
+    const logger = Logger(level as LogLevelOption);
+
+    const projectDir = process.env?.['PWD'] ?? process.cwd();
+    const packageDir = tsConfigPath;
+
+    const currentManifest = manifestMod.readManifest(projectDir);
+    const result = inspectMod.inspectConfigs(currentManifest, packageDir);
+    const output = inspectMod.formatInspectResult(result, currentManifest.overrides);
+
+    logger.info(output);
   });
 
 program.parse();

@@ -18,15 +18,12 @@
     // "tsBuildInfoFile": "./.tsbuildinfo" /* Specify the path to .tsbuildinfo incremental compilation file. */,
     /* Language and Environment */
     "lib": [
-      "es2023"
+      "ESNext"
     ] /* Specify a set of bundled library declaration files that describe the target runtime environment. */,
-    "module": "NodeNext" /* Specify what module code is generated. */,
-    "moduleResolution": "NodeNext" /* Specify how TypeScript looks up a file from a given module specifier. */,
-    "typeRoots": [
-      "./types",
-      "./node_modules/@types"
-    ] /* Specify multiple folders that act like './node_modules/@types'. */,
-    "target": "ES2023" /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */,
+    "module": "esnext" /* Specify what module code is generated. */,
+    "moduleResolution": "bundler" /* Specify how TypeScript looks up a file from a given module specifier. */,
+    // "typeRoots": ["./types", "./node_modules/@types"] /* Specify multiple folders that act like './node_modules/@types'. */,
+    "target": "esnext" /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */,
     "jsx": "react" /* Specify what JSX code is generated. */,
     "experimentalDecorators": true /* Enable experimental support for legacy experimental decorators. */,
     /* Modules */
@@ -44,7 +41,7 @@
     "downlevelIteration": true /* Emit more compliant, but verbose and less performant JavaScript for iteration. */,
     "noEmitHelpers": true /* Disable generating custom helper functions like '__extends' in compiled output. */,
     // "noEmit": true /* Disable emitting files from a compilation. */,
-    "outDir": "./dist",                              /* Specify an output folder for all emitted files. */
+    "outDir": "./dist", /* Specify an output folder for all emitted files. */
     "noEmitOnError": true /* Disable emitting files if any type checking errors are reported. */,
     "preserveConstEnums": true /* Disable erasing 'const enum' declarations in generated code. */,
     /* Interop Constraints */

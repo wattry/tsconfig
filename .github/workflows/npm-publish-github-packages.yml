@@ -1,7 +1,7 @@
 # This workflow will run tests using node and then publish a package to GitHub Packages when a release is created
 # For more information see: https://docs.github.com/en/actions/publishing-packages/publishing-nodejs-packages
 
-name: Node.js Package
+name: Publish Package
 on:
   push:
     branches: [main]
@@ -9,7 +9,7 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
       packages: write
     steps:
       - uses: actions/checkout@v4
@@ -20,6 +20,23 @@ jobs:
       - run: npm install -g pnpm
       - run: pnpm install
       - run: pnpm build
-      - run: pnpm publish
+      - name: publish
+        run: |
+          CURRENT_VERSION=$(npm show @wattry/tsconfig version)
+          NEW_VERSION=$(node -p "require('./package.json').version")
+
+          echo "current:  $CURRENT_VERSION"
+          echo "new:      $NEW_VERSION"
+
+          if [ "$CURRENT_VERSION" == "$NEW_VERSION" ]; then
+            echo "No change in version skipping publish"
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag "v$VERSION"
+          git push origin "v$VERSION"
+          pnpm publish
         env:
           NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}

@@ -27,7 +27,7 @@
     "jsx": "react" /* Specify what JSX code is generated. */,
     "experimentalDecorators": true /* Enable experimental support for legacy experimental decorators. */,
     /* Modules */
-    "rootDir": "./src" /* Specify the root folder within your source files. */,
+    "rootDir": "./" /* Specify the root folder within your source files. */,
     "baseUrl": "." /* Specify the base directory to resolve non-relative module names. */,
     /* JavaScript Support */
     "allowJs": false /* Allow JavaScript files to be a part of your program. Use the 'checkJS' option to get errors from these files. */,

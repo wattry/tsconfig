@@ -44,7 +44,7 @@
     "lint": "eslint  --config ./eslint.config.js --no-warn-ignored src/**/*.ts",
     "lint:config": "pnpx @eslint/config-inspector@latest --config ./eslint.config.js",
     "lint:fix": "eslint  --config ./eslint.config.js --fix --no-warn-ignored src/**/*.ts",
-    "prepare": "husky",
+    "prepare": "pnpm run build",
     "test:ci": "vitest . --silent --collectCoverage --coverageDirectory='./coverage' --ci --reporters=default --reporters=junit --watchAll=false --passWithNoTests",
     "test:watch": "vitest . --passWithNoTests --watch",
     "test": "vitest . --passWithNoTests",
@@ -52,5 +52,5 @@
     "upgrade:all": "pnpm update --latest"
   },
   "type": "module",
-  "version": "0.0.2"
+  "version": "0.0.3"
 }

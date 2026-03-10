@@ -1,7 +1,7 @@
 import child from 'node:child_process';
 
 import { logger } from './logger.js';
-import { Options, BasePkgJson } from './types.js';
+import type { Options, BasePkgJson } from './types.js';
 
 export function installDev(
   basePkgJson: BasePkgJson,

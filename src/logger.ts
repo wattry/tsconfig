@@ -1,6 +1,5 @@
-import { LogLevel, LogLevelOption } from './types.js';
-
-export let logger: CLogger;
+import type { LogLevelOption } from './types.js';
+import { LogLevel } from './types.js';
 
 class CLogger {
   level: LogLevel = LogLevel['info'];
@@ -36,8 +35,12 @@ class CLogger {
   }
 }
 
+export let logger: CLogger;
+
 export function Logger(level?: LogLevelOption) {
-  logger = new CLogger(level);
+  if (!logger) {
+    logger = new CLogger(level);
+  }
 
   return logger;
 }

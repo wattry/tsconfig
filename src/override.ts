@@ -1,4 +1,4 @@
-import { Manifest, Override } from './types.js';
+import type { Manifest, Override } from './types.js';
 
 export function addOverride(
   manifest: Manifest,

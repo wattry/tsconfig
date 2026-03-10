@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { encoding } from './files.js';
-import { Manifest, Snapshots } from './types.js';
+import type { Manifest, Snapshots } from './types.js';
 
 const MANIFEST_FILE = '.ts.config.json';
 

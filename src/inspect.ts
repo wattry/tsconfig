@@ -1,7 +1,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { diffCompilerOptions, diffText, CompilerOptionDiff, TextLineDiff } from './diff.js';
-import { Manifest } from './types.js';
+import type { CompilerOptionDiff, TextLineDiff } from './diff.js';
+import { diffCompilerOptions, diffText } from './diff.js';
+import type { Manifest } from './types.js';
 import { encoding } from './files.js';
 
 export interface InspectResult {

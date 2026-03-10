@@ -9,8 +9,9 @@ import dependencies from './dependencies.js';
 import * as manifestMod from './manifest.js';
 import * as inspectMod from './inspect.js';
 import * as overrideMod from './override.js';
-import { tsConfigPath, choices, LogLevelOption } from './types.js';
-import { BasePkgJson, Options, Snapshots } from './types.js';
+import type { LogLevelOption } from './types.js';
+import { tsConfigPath, choices } from './types.js';
+import type { BasePkgJson, Options, Snapshots } from './types.js';
 
 const program = new Command();
 const basePkgJsonString = fs

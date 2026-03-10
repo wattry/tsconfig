@@ -1,8 +1,9 @@
-import fs, { EncodingOption } from 'node:fs';
+import type { EncodingOption } from 'node:fs';
+import fs from 'node:fs';
 import path from 'node:path';
 
 import { logger } from './logger.js';
-import { BasePkgJson, PkgJson, ConfigMap } from './types.js';
+import type { BasePkgJson, PkgJson, ConfigMap } from './types.js';
 
 export const rmOptions = { recursive: true, force: true };
 export const encoding: EncodingOption = { encoding: 'utf8' };

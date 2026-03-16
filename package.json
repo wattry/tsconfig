@@ -9,12 +9,12 @@
     "runtime": {
       "name": "node",
       "version": "^24.13.1",
-      "onFail": "download"
+      "onFail": "warn"
     },
     "packageManager": {
       "name": "pnpm",
       "version": "10.29.3",
-      "onFail": "download"
+      "onFail": "warn"
     }
   },
   "bin": {

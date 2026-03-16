@@ -20,6 +20,7 @@ export default defineConfig(
           parserOptions: {
             projectService: true,
             tsconfigRootDir: import.meta.dirname,
+            defaultProject: 'tsconfig.json',
           },
         },
         plugins: {
@@ -85,7 +86,7 @@ export default defineConfig(
           }],
           '@typescript-eslint/naming-convention': [
             'warn',
-            { selector: 'default', format: ['camelCase'] },
+            { selector: 'default', format: ['camelCase', 'UPPER_CASE'] },
             { selector: 'import', format: null },
             { selector: 'variable', format: ['camelCase', 'UPPER_CASE'] },
             { selector: 'parameter', format: ['camelCase'], leadingUnderscore: 'allow' },
@@ -103,7 +104,7 @@ export default defineConfig(
           'no-param-reassign': 'error',
           'no-plusplus': ['error', { allowForLoopAfterthoughts: true }],
           'no-shadow': 'off',
-          'no-underscore-dangle': 'warn',
+          'no-underscore-dangle': ['warn', { allow: ['__filename', '__direname'] }],
           'no-use-before-define': ['error', 'nofunc'],
           'prefer-const': 'error',
           'prefer-destructuring': ['error', { array: false, object: false }],

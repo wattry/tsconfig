@@ -1,5 +1,10 @@
 {
+  "name": "@wattry/tsconfig",
+  "description": "Base TS configure for new projects",
+  "version": "0.0.4",
+  "type": "module",
   "author": "wattry",
+  "license": "Apache-2.0",
   "bin": {
     "tsconfig": "./dist/index.js"
   },
@@ -8,14 +13,19 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
-    "./tsconfig.json": "./tsconfig.json",
-    "./eslint.config.js": "./eslint.config.js",
-    "./vitest.config.js": "./vitest.config.js"
+    "./tsconfig": "./tsconfig.json",
+    "./eslint.config": "./eslint.config.js",
+    "./vitest.config": "./vitest.config.js"
   },
   "dependencies": {
     "commander": "14.0.3"
   },
-  "description": "Base TS configure for new projects",
+  "files": [
+    "dist/**/*",
+    "eslint.config.js",
+    "tsconfig.json",
+    "vitest.config.js"
+  ],
   "devDependencies": {
     "@eslint/config-inspector": "1.5.0",
     "@stylistic/eslint-plugin": "5.10.0",
@@ -28,16 +38,8 @@
     "typescript-eslint": "8.56.1",
     "vitest": "4.0.18"
   },
-  "files": [
-    "dist/**/*",
-    "eslint.config.js",
-    "tsconfig.json",
-    "vitest.config.js"
-  ],
-  "license": "Apache-2.0",
-  "name": "@wattry/tsconfig",
   "scripts": {
-    "build": "pnpm clean && pnpm tsc --pretty --project ./tsconfig.json",
+    "build": "pnpm clean && pnpm tsc --project ./tsconfig.json",
     "build:pack": "pnpm build && pnpm pack",
     "clean": "rm -rf dist",
     "dev": "tsx watch --include './src/**/*.ts' ./src/index.ts",
@@ -48,9 +50,7 @@
     "test:ci": "vitest . --silent --collectCoverage --coverageDirectory='./coverage' --ci --reporters=default --reporters=junit --watchAll=false --passWithNoTests",
     "test:watch": "vitest . --passWithNoTests --watch",
     "test": "vitest . --passWithNoTests",
-    "typecheck": "pnpm tsc --noEmit --project ./tsconfig.json",
+    "typecheck": "tsc --noEmit --project ./tsconfig.json",
     "upgrade:all": "pnpm update --latest"
-  },
-  "type": "module",
-  "version": "0.0.3"
+  }
 }

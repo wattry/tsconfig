@@ -1,10 +1,22 @@
 {
   "name": "@wattry/tsconfig",
   "description": "Base TS configure for new projects",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "type": "module",
   "author": "wattry",
   "license": "Apache-2.0",
+  "devEngines": {
+    "runtime": {
+      "name": "node",
+      "version": "^24.13.1",
+      "onFail": "download"
+    },
+    "packageManager": {
+      "name": "pnpm",
+      "version": "10.29.3",
+      "onFail": "download"
+    }
+  },
   "bin": {
     "tsconfig": "./dist/index.js"
   },

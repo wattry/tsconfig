@@ -8,12 +8,6 @@ import type { BasePkgJson, PkgJson, ConfigMap } from './types.js';
 export const rmOptions = { recursive: true, force: true };
 export const encoding: EncodingOption = { encoding: 'utf8' };
 
-const TSCONFIG_WRAPPER = JSON.stringify(
-  { extends: '@wattry/tsconfig/tsconfig.json', compilerOptions: {} },
-  null,
-  2,
-);
-
 const ESLINT_WRAPPER = `import base from '@wattry/tsconfig/eslint.config.js';
 
 export default [
@@ -32,15 +26,35 @@ export default {
 };
 `;
 
-export function writeWrappers(projectDir: string): void {
+export function writeWrappers(
+  projectDir: string,
+  baseTsConfig: { compilerOptions: Record<string, unknown>; include?: string[]; exclude?: string[] },
+): void {
+  const { typeRoots, rootDir, baseUrl, outDir } = baseTsConfig.compilerOptions;
+  const tsconfigWrapper = JSON.stringify(
+    {
+      extends: '@wattry/tsconfig/tsconfig.json',
+      ...(baseTsConfig.include && { include: baseTsConfig.include }),
+      ...(baseTsConfig.exclude && { exclude: baseTsConfig.exclude }),
+      compilerOptions: {
+        ...(typeRoots !== undefined && { typeRoots }),
+        ...(rootDir !== undefined && { rootDir }),
+        ...(baseUrl !== undefined && { baseUrl }),
+        ...(outDir !== undefined && { outDir }),
+      },
+    },
+    null,
+    2,
+  );
+
   logger.info('Writing wrapper configs');
-  fs.writeFileSync(path.join(projectDir, 'tsconfig.json'), TSCONFIG_WRAPPER);
+  fs.writeFileSync(path.join(projectDir, 'tsconfig.json'), tsconfigWrapper);
   fs.writeFileSync(path.join(projectDir, 'eslint.config.js'), ESLINT_WRAPPER);
   fs.writeFileSync(path.join(projectDir, 'vitest.config.js'), VITEST_WRAPPER);
   logger.info('Wrote wrapper configs');
 }
 
-export function configurePkgJson(projectDir: string, basePkgJson: BasePkgJson, configs: ConfigMap): void {
+export function configurePkgJson(projectDir: string, basePkgJson: BasePkgJson, configs: ConfigMap, overwriteScripts = false): void {
   logger.info('Configure package.json');
 
   const pkgJson: PkgJson = JSON.parse(
@@ -51,7 +65,9 @@ export function configurePkgJson(projectDir: string, basePkgJson: BasePkgJson, c
 
   const newPkgJson: PkgJson = {
     ...pkgJson,
-    scripts: { ...basePkgJson.scripts, ...(pkgJson.scripts ?? {}) },
+    scripts: overwriteScripts
+      ? { ...(pkgJson.scripts ?? {}), ...basePkgJson.scripts }
+      : { ...basePkgJson.scripts, ...(pkgJson.scripts ?? {}) },
   };
 
   if (!pkgJson.type) newPkgJson.type = 'module';

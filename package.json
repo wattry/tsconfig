@@ -1,7 +1,7 @@
 {
   "name": "@wattry/tsconfig",
   "description": "Base TS configure for new projects",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "type": "module",
   "author": "wattry",
   "license": "Apache-2.0",
@@ -45,7 +45,7 @@
     "eslint": "10.0.3",
     "globals": "17.4.0",
     "husky": "9.1.7",
-    "tsx": "^4.21.0",
+    "tsx": "4.21.0",
     "typescript": "5.9.3",
     "typescript-eslint": "8.56.1",
     "vitest": "4.0.18"

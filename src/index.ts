@@ -13,6 +13,14 @@ import type { LogLevelOption } from './types.js';
 import { tsConfigPath, choices } from './types.js';
 import type { BasePkgJson, Options, Snapshots } from './types.js';
 
+function parseJsonc(text: string): unknown {
+  const stripped = text
+    .replace(/\/\/[^\n]*/g, '')
+    .replace(/\/\*[\s\S]*?\*\//g, '')
+    .replace(/,(\s*[}\]])/g, '$1');
+  return JSON.parse(stripped);
+}
+
 const program = new Command();
 const basePkgJsonString = fs
   .readFileSync(`${tsConfigPath}/package.json`, files.encoding)
@@ -70,12 +78,9 @@ program
     files.mkDirectories('src');
     files.mkDirectories('types');
 
-    // Write thin wrapper config files
-    files.writeWrappers(projectDir);
-
     // Merge package.json additively
     const configs = new Map<string, string>();
-    files.configurePkgJson(projectDir, basePkgJson, configs);
+    files.configurePkgJson(projectDir, basePkgJson, configs, true);
     files.writeConfigs(configs);
 
     // Install required dev dependencies
@@ -83,7 +88,14 @@ program
 
     // Capture base config snapshots from the installed package
     const tsconfigRaw = fs.readFileSync(`${tsConfigPath}/tsconfig.json`, files.encoding).toString();
-    const tsconfigParsed: { compilerOptions: Record<string, unknown> } = JSON.parse(tsconfigRaw);
+    const tsconfigParsed = parseJsonc(tsconfigRaw) as {
+      compilerOptions: Record<string, unknown>;
+      include?: string[];
+      exclude?: string[];
+    };
+
+    // Write thin wrapper config files seeded with base tsconfig values
+    files.writeWrappers(projectDir, tsconfigParsed);
 
     const eslintRaw = fs.readFileSync(`${tsConfigPath}/eslint.config.js`, files.encoding).toString();
     const vitestRaw = fs.readFileSync(`${tsConfigPath}/vitest.config.js`, files.encoding).toString();
@@ -171,7 +183,7 @@ program
     ) as { version: string };
 
     // Read new base config snapshots from the freshly installed package
-    const newTsConfig = JSON.parse(
+    const newTsConfig = parseJsonc(
       fs.readFileSync(`${tsConfigPath}/tsconfig.json`, files.encoding).toString()
     ) as { compilerOptions?: Record<string, unknown> };
     const newEslint = fs.readFileSync(`${tsConfigPath}/eslint.config.js`, files.encoding).toString();

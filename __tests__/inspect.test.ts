@@ -24,7 +24,7 @@ const manifest: Manifest = {
 
 describe('inspectConfigs', () => {
   it('detects added compiler option', () => {
-    vi.mocked(fs.readFileSync).mockImplementation((p) => {
+    vi.mocked(fs.readFileSync).mockImplementation((p: unknown) => {
       if ((p as string).endsWith('tsconfig.json')) {
         return JSON.stringify({ compilerOptions: { strict: true, target: 'ES2020', noUncheckedIndexedAccess: true } });
       }
@@ -38,7 +38,7 @@ describe('inspectConfigs', () => {
   });
 
   it('returns empty diffs when configs unchanged', () => {
-    vi.mocked(fs.readFileSync).mockImplementation((p) => {
+    vi.mocked(fs.readFileSync).mockImplementation((p: unknown) => {
       if ((p as string).endsWith('tsconfig.json')) {
         return JSON.stringify({ compilerOptions: { strict: true, target: 'ES2020' } });
       }

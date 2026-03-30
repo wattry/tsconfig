@@ -30,16 +30,15 @@ export function writeWrappers(
   projectDir: string,
   baseTsConfig: { compilerOptions: Record<string, unknown>; include?: string[]; exclude?: string[] },
 ): void {
-  const { typeRoots, rootDir, baseUrl, outDir } = baseTsConfig.compilerOptions;
+  const { typeRoots, rootDir, outDir } = baseTsConfig.compilerOptions;
   const tsconfigWrapper = JSON.stringify(
     {
-      extends: '@wattry/tsconfig/tsconfig.json',
+      extends: '@wattry/tsconfig/base',
       ...(baseTsConfig.include && { include: baseTsConfig.include }),
       ...(baseTsConfig.exclude && { exclude: baseTsConfig.exclude }),
       compilerOptions: {
         ...(typeRoots !== undefined && { typeRoots }),
         ...(rootDir !== undefined && { rootDir }),
-        ...(baseUrl !== undefined && { baseUrl }),
         ...(outDir !== undefined && { outDir }),
       },
     },

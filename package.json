@@ -1,7 +1,7 @@
 {
   "name": "@wattry/tsconfig",
   "description": "Base TS configure for new projects",
-  "version": "0.0.6",
+  "version": "0.2.0",
   "type": "module",
   "author": "wattry",
   "license": "Apache-2.0",
@@ -25,30 +25,30 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
-    "./tsconfig": "./tsconfig.json",
-    "./eslint.config": "./eslint.config.js",
-    "./vitest.config": "./vitest.config.js"
+    "./tsconfig.base": "./tsconfig.base.json",
+    "./eslint.config": "./eslint.base.js"
   },
   "dependencies": {
     "commander": "14.0.3"
   },
   "files": [
     "dist/**/*",
-    "eslint.config.js",
-    "tsconfig.json",
-    "vitest.config.js"
+    "eslint.base.js",
+    "tsconfig.base.json"
   ],
   "devDependencies": {
     "@eslint/config-inspector": "1.5.0",
     "@stylistic/eslint-plugin": "5.10.0",
-    "@types/node": "24.12.0",
-    "eslint": "10.0.3",
+    "@types/node": "25.5.0",
+    "dotenv": "^17.3.1",
+    "dotenv-expand": "^12.0.3",
+    "eslint": "10.1.0",
     "globals": "17.4.0",
     "husky": "9.1.7",
     "tsx": "4.21.0",
-    "typescript": "5.9.3",
-    "typescript-eslint": "8.56.1",
-    "vitest": "4.0.18"
+    "typescript": "6.0.2",
+    "typescript-eslint": "8.57.2",
+    "vitest": "4.1.2"
   },
   "scripts": {
     "build": "pnpm clean && pnpm tsc --project ./tsconfig.json",

@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.1](https://github.com/wattry/tsconfig/compare/tsconfig-v0.4.0...tsconfig-v0.4.1) (2026-06-05)
+
+
+### Bug Fixes
+
+* release bump ([8beb001](https://github.com/wattry/tsconfig/commit/8beb001a4af2e233ee35e7ed8ac5242dec9ea314))
+
 ## [0.4.0](https://github.com/wattry/tsconfig/compare/tsconfig-v0.3.0...tsconfig-v0.4.0) (2026-06-05)
 
 

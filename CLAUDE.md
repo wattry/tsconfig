@@ -54,7 +54,12 @@ Husky `pre-commit` runs `pnpm lint` then `pnpm typecheck` — both must pass to 
 
 ## Release
 
-Publishing is automated by `.github/workflows/npm-publish-github-packages.yml` on push to `main`: it builds, compares the published version to `package.json`'s, and only publishes (to GitHub Packages) when the version changed — tagging `v{VERSION}`. To cut a release, bump `version` in `package.json` and push to `main`.
+Versioning is owned by **release-please** (`release-please-config.json` + `.release-please-manifest.json`) — do **not** hand-edit `version` in `package.json`. The `pr.yaml` workflow fails any PR where `package.json` version ≠ the manifest.
+
+- Releases are driven by **Conventional Commits**: `fix:` → patch, `feat:` → minor, `feat!:`/`BREAKING CHANGE` → major. Commits with none of these produce no release. `pr.yaml` posts a sticky comment previewing the next version and fails if the PR's base has gone stale.
+- `release.yaml` (on push to `main`) runs `release-please-action`, which opens/maintains a **release PR** bumping `package.json` + the manifest and updating `CHANGELOG.md`. Merging that PR tags `v{version}` and cuts a GitHub Release — and, in the same run (gated on the action's `releases_created` output), builds and **publishes to GitHub Packages** via `pnpm publish` (`registry-url` + `NODE_AUTH_TOKEN`).
+
+To cut a release: land Conventional-Commit PRs into `main`, then merge the release PR release-please raises. Uses `secrets.RELEASE_PLEASE_TOKEN` (a PAT) for the release step; `GITHUB_TOKEN` with `packages: write` for publish.
 
 <!-- stackit:start -->
 ## Git Workflow: Stacked PRs

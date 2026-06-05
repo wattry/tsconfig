@@ -7,6 +7,7 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  packages: write
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
@@ -16,7 +17,39 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: googleapis/release-please-action@v4
+        id: release
         with:
           token: ${{ secrets.RELEASE_PLEASE_TOKEN }}
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
+
+      # Steps below run only on the push that merges the release PR,
+      # i.e. when release-please actually cuts a tag + GitHub Release.
+      - uses: actions/checkout@v6
+        if: ${{ steps.release.outputs.releases_created == 'true' }}
+
+      - uses: pnpm/action-setup@v6
+        if: ${{ steps.release.outputs.releases_created == 'true' }}
+        with:
+          version: 11.3.0
+
+      - uses: actions/setup-node@v6
+        if: ${{ steps.release.outputs.releases_created == 'true' }}
+        with:
+          node-version: 24
+          cache: pnpm
+          registry-url: https://npm.pkg.github.com
+
+      - name: Install dependencies
+        if: ${{ steps.release.outputs.releases_created == 'true' }}
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        if: ${{ steps.release.outputs.releases_created == 'true' }}
+        run: pnpm run build
+
+      - name: Publish to GitHub Packages
+        if: ${{ steps.release.outputs.releases_created == 'true' }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: pnpm publish --no-git-checks

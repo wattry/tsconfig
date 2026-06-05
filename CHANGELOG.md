@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.2](https://github.com/wattry/tsconfig/compare/tsconfig-v0.4.1...tsconfig-v0.4.2) (2026-06-05)
+
+
+### Bug Fixes
+
+* remove the vitest config definition ([d652a1f](https://github.com/wattry/tsconfig/commit/d652a1f2549ebebe7a39fc1194c9272dcb3a6e37))
+
 ## [0.4.1](https://github.com/wattry/tsconfig/compare/tsconfig-v0.4.0...tsconfig-v0.4.1) (2026-06-05)
 
 

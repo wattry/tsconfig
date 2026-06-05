@@ -1,0 +1,125 @@
+name: pr-version-check
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+jobs:
+  compute-next-version:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Guardrail — package.json version must match manifest
+        run: |
+          PKG_VERSION=$(jq -r '.version' package.json)
+          MANIFEST_VERSION=$(jq -r '."."' .release-please-manifest.json)
+          if [[ "$PKG_VERSION" != "$MANIFEST_VERSION" ]]; then
+            echo "::error file=package.json::package.json version ($PKG_VERSION) does not match .release-please-manifest.json ($MANIFEST_VERSION). Do not hand-edit the version — release-please owns both files. Revert the package.json change and let the release PR bump it."
+            exit 1
+          fi
+
+      - name: Read main's current version
+        id: main
+        run: |
+          git fetch origin main
+          MAIN_VERSION=$(git show origin/main:.release-please-manifest.json 2>/dev/null | jq -r '."."' 2>/dev/null || echo "")
+          if [[ -z "$MAIN_VERSION" || "$MAIN_VERSION" == "null" ]]; then
+            MAIN_VERSION="0.0.0"
+          fi
+          echo "main_version=$MAIN_VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Read initial-version from config
+        id: cfg
+        run: |
+          INITIAL=$(jq -r '.packages["."].["initial-version"] // ""' release-please-config.json)
+          echo "initial=$INITIAL" >> "$GITHUB_OUTPUT"
+
+      - name: Compute bump for this PR
+        id: bump
+        run: |
+          git fetch origin main
+          BASE=$(git merge-base HEAD origin/main)
+          BUMP="none"
+          while read -r subject; do
+            [[ -z "$subject" ]] && continue
+            if echo "$subject" | grep -qE '(^[a-z]+(\([^)]+\))?!:|BREAKING[ -]CHANGE)'; then
+              BUMP="major"; break
+            elif echo "$subject" | grep -qE '^feat(\([^)]+\))?:'; then
+              [[ "$BUMP" != "major" ]] && BUMP="minor"
+            elif echo "$subject" | grep -qE '^fix(\([^)]+\))?:'; then
+              [[ "$BUMP" == "none" ]] && BUMP="patch"
+            fi
+          done < <(git log --format=%s "$BASE..HEAD")
+          echo "bump=$BUMP" >> "$GITHUB_OUTPUT"
+
+      - name: Compute next version
+        id: next
+        run: |
+          MAIN="${{ steps.main.outputs.main_version }}"
+          BUMP="${{ steps.bump.outputs.bump }}"
+          INITIAL="${{ steps.cfg.outputs.initial }}"
+
+          if [[ "$MAIN" == "0.0.0" && "$BUMP" != "none" && -n "$INITIAL" ]]; then
+            NEXT="$INITIAL"
+          else
+            IFS=. read -r MAJ MIN PAT <<< "$MAIN"
+            case "$BUMP" in
+              major) NEXT="$((MAJ+1)).0.0" ;;
+              minor) NEXT="$MAJ.$((MIN+1)).0" ;;
+              patch) NEXT="$MAJ.$MIN.$((PAT+1))" ;;
+              none)  NEXT="(no release)" ;;
+            esac
+          fi
+          echo "next=$NEXT" >> "$GITHUB_OUTPUT"
+
+      - name: Read version at PR's base
+        id: base
+        run: |
+          PR_BASE_SHA="${{ github.event.pull_request.base.sha }}"
+          BASE_VERSION=$(git show "$PR_BASE_SHA:.release-please-manifest.json" 2>/dev/null | jq -r '."."' 2>/dev/null || echo "")
+          if [[ -z "$BASE_VERSION" || "$BASE_VERSION" == "null" ]]; then
+            BASE_VERSION="0.0.0"
+          fi
+          echo "base_version=$BASE_VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Guardrail — detect stale base
+        id: guard
+        run: |
+          BASE="${{ steps.base.outputs.base_version }}"
+          MAIN="${{ steps.main.outputs.main_version }}"
+          if [[ "$BASE" != "$MAIN" ]]; then
+            echo "stale=true" >> "$GITHUB_OUTPUT"
+            echo "from=$BASE" >> "$GITHUB_OUTPUT"
+            echo "to=$MAIN" >> "$GITHUB_OUTPUT"
+          else
+            echo "stale=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Post sticky comment
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: pr-version-check
+          message: |
+            ### Next release preview
+            - Current `main`: **v${{ steps.main.outputs.main_version }}**
+            - This PR bumps: **${{ steps.bump.outputs.bump }}**
+            - Next version if merged now: **${{ steps.next.outputs.next == '(no release)' && '(no release — no `feat:`, `fix:`, or breaking-change commits)' || format('v{0}', steps.next.outputs.next) }}**
+
+            ${{ steps.guard.outputs.stale == 'true' && format('⚠️ **`main` has moved from v{0} → v{1} since this PR opened.** Rebase or merge `main` into this branch before merging.', steps.guard.outputs.from, steps.guard.outputs.to) || '✅ Base is current.' }}
+
+      - name: Fail if base is stale
+        if: steps.guard.outputs.stale == 'true'
+        run: |
+          echo "::error::main has moved from v${{ steps.guard.outputs.from }} to v${{ steps.guard.outputs.to }} since this PR was opened. Rebase before merging."
+          exit 1

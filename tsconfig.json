@@ -1,11 +1,14 @@
 {
+  "extends": "./tsconfig.base.json",
   "include": [
     "src",
     "types",
     "tests",
     "mocks",
     "__tests__",
-    "__mocks__"
+    "__mocks__",
+    "vitest.config.ts",
+    "eslint.config.ts"
   ],
   "exclude": [
     "dist",
@@ -15,11 +18,13 @@
     "lib": [
       "ESNext"
     ],
+    "types": [
+      "node"
+    ],
     "typeRoots": [
       "./types",
       "./node_modules/@types"
     ],
-    "rootDir": "./src",
-    "outDir": "./dist",
+    "rootDir": "."
   }
 }

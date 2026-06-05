@@ -1,19 +1,20 @@
 {
   "name": "@wattry/tsconfig",
-  "description": "Base TS configure for new projects",
-  "version": "0.2.0",
+  "description": "Base config for bootstrapping and maintaining Typescript projects",
+  "version": "0.3.0",
   "type": "module",
   "author": "wattry",
   "license": "Apache-2.0",
+  "keywords": ["Typescript", "lint", "eslint", "vite", "config", "configuration"],
   "devEngines": {
     "runtime": {
       "name": "node",
-      "version": "^24.13.1",
+      "version": "24.16.0",
       "onFail": "warn"
     },
     "packageManager": {
       "name": "pnpm",
-      "version": "10.29.3",
+      "version": "11.3.0",
       "onFail": "warn"
     }
   },
@@ -25,39 +26,57 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
-    "./tsconfig.base": "./tsconfig.base.json",
-    "./eslint.config": "./eslint.base.js"
+    "./types": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./base": "./tsconfig.base.json",
+    "./eslint": {
+      "types": "./types/eslint.base.d.ts",
+      "default": "./eslint.base.js"
+    },
+    "./vitest": {
+      "types": "./types/vitest.config.d.ts",
+      "default": "./vitest.config.js"
+    }
   },
   "dependencies": {
-    "commander": "14.0.3"
+    "commander": "15.0.0"
   },
   "files": [
     "dist/**/*",
-    "eslint.base.js",
-    "tsconfig.base.json"
+    "types/**/*",
+    "eslint.base.ts",
+    "eslint.config.ts",
+    "tsconfig.json",
+    "tsconfig.base.json",
+    "tsconfig.build.json",
+    "vitest.config.ts"
   ],
   "devDependencies": {
-    "@eslint/config-inspector": "1.5.0",
+    "@eslint/config-helpers": "0.6.0",
+    "@eslint/config-inspector": "3.0.4",
     "@stylistic/eslint-plugin": "5.10.0",
-    "@types/node": "25.5.0",
-    "dotenv": "^17.3.1",
-    "dotenv-expand": "^12.0.3",
-    "eslint": "10.1.0",
-    "globals": "17.4.0",
+    "@types/node": "24.12.4",
+    "dotenv": "17.4.2",
+    "dotenv-expand": "13.0.0",
+    "eslint": "10.4.1",
+    "globals": "17.6.0",
     "husky": "9.1.7",
-    "tsx": "4.21.0",
-    "typescript": "6.0.2",
-    "typescript-eslint": "8.57.2",
-    "vitest": "4.1.2"
+    "jiti": "^2.7.0",
+    "tsx": "4.22.4",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.60.1",
+    "vitest": "4.1.8"
   },
   "scripts": {
-    "build": "pnpm clean && pnpm tsc --project ./tsconfig.json",
-    "build:pack": "pnpm build && pnpm pack",
+    "build": "pnpm clean && pnpm tsc --project ./tsconfig.build.json",
+    "build:pack": "pnpm build && pnpm pack && pnpm clean",
     "clean": "rm -rf dist",
     "dev": "tsx watch --include './src/**/*.ts' ./src/index.ts",
-    "lint": "eslint  --config ./eslint.config.js --no-warn-ignored src/**/*.ts",
-    "lint:config": "pnpx @eslint/config-inspector@latest --config ./eslint.config.js",
-    "lint:fix": "eslint  --config ./eslint.config.js --fix --no-warn-ignored src/**/*.ts",
+    "lint": "eslint  --config ./eslint.config.ts --no-warn-ignored src/**/*.ts",
+    "lint:config": "pnpx @eslint/config-inspector@latest --config ./eslint.config.ts",
+    "lint:fix": "eslint  --config ./eslint.config.ts --fix --no-warn-ignored src/**/*.ts",
     "prepare": "pnpm run build",
     "test:ci": "vitest . --silent --collectCoverage --coverageDirectory='./coverage' --ci --reporters=default --reporters=junit --watchAll=false --passWithNoTests",
     "test:watch": "vitest . --passWithNoTests --watch",

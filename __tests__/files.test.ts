@@ -14,7 +14,7 @@ const projectDir = '/project';
 describe('writeWrappers', () => {
   it('writes tsconfig.json with extends pointing to package', () => {
     vi.mocked(fs.writeFileSync).mockReset();
-    writeWrappers(projectDir, { compilerOptions: {} });
+    writeWrappers(projectDir, { compilerOptions: {} }, { compilerOptions: {} });
     const calls = vi.mocked(fs.writeFileSync).mock.calls;
     const tsconfigCall = calls.find(([p]: [unknown, ...unknown[]]) => (p as string).endsWith('tsconfig.json'));
     expect(tsconfigCall).toBeDefined();
@@ -23,28 +23,40 @@ describe('writeWrappers', () => {
     expect(content).toHaveProperty('compilerOptions');
   });
 
-  it('writes eslint.config.js importing from package', () => {
+  it('writes eslint.config.ts importing from package', () => {
     vi.mocked(fs.writeFileSync).mockReset();
-    writeWrappers(projectDir, { compilerOptions: {} });
+    writeWrappers(projectDir, { compilerOptions: {} }, { compilerOptions: {} });
     const calls = vi.mocked(fs.writeFileSync).mock.calls;
-    const eslintCall = calls.find(([p]: [unknown, ...unknown[]]) => (p as string).endsWith('eslint.config.js'));
+    const eslintCall = calls.find(([p]: [unknown, ...unknown[]]) => (p as string).endsWith('eslint.config.ts'));
     expect(eslintCall).toBeDefined();
-    expect(eslintCall![1] as string).toContain("from '@wattry/tsconfig/eslint.config.js'");
+    expect(eslintCall![1] as string).toContain("from '@wattry/tsconfig/eslint'");
   });
 
-  it('writes vitest.config.js importing from package', () => {
+  it('writes vitest.config.ts importing from package', () => {
     vi.mocked(fs.writeFileSync).mockReset();
-    writeWrappers(projectDir, { compilerOptions: {} });
+    writeWrappers(projectDir, { compilerOptions: {} }, { compilerOptions: {} });
     const calls = vi.mocked(fs.writeFileSync).mock.calls;
-    const vitestCall = calls.find(([p]: [unknown, ...unknown[]]) => (p as string).endsWith('vitest.config.js'));
+    const vitestCall = calls.find(([p]: [unknown, ...unknown[]]) => (p as string).endsWith('vitest.config.ts'));
     expect(vitestCall).toBeDefined();
-    expect(vitestCall![1] as string).toContain("from '@wattry/tsconfig/vitest.config.js'");
+    expect(vitestCall![1] as string).toContain("from '@wattry/tsconfig/vitest'");
   });
 
-  it('writes exactly 3 files', () => {
+  it('writes tsconfig.build.json extending the local tsconfig.json', () => {
     vi.mocked(fs.writeFileSync).mockReset();
-    writeWrappers(projectDir, { compilerOptions: {} });
-    expect(vi.mocked(fs.writeFileSync).mock.calls).toHaveLength(3);
+    writeWrappers(projectDir, { compilerOptions: {} }, { compilerOptions: { rootDir: './src', outDir: './dist' }, include: ['src'] });
+    const calls = vi.mocked(fs.writeFileSync).mock.calls;
+    const buildCall = calls.find(([p]: [unknown, ...unknown[]]) => (p as string).endsWith('tsconfig.build.json'));
+    expect(buildCall).toBeDefined();
+    const content = JSON.parse(buildCall![1] as string);
+    expect(content.extends).toBe('./tsconfig.json');
+    expect(content.compilerOptions.rootDir).toBe('./src');
+    expect(content.compilerOptions.outDir).toBe('./dist');
+  });
+
+  it('writes exactly 4 files', () => {
+    vi.mocked(fs.writeFileSync).mockReset();
+    writeWrappers(projectDir, { compilerOptions: {} }, { compilerOptions: {} });
+    expect(vi.mocked(fs.writeFileSync).mock.calls).toHaveLength(4);
   });
 });
 
@@ -118,19 +130,20 @@ describe('configurePkgJson', () => {
 });
 
 describe('rmConfigs', () => {
-  it('removes all four wrapper files from projectDir', () => {
+  it('removes all wrapper files from projectDir', () => {
     vi.mocked(fs.rmSync).mockReset();
     rmConfigs(projectDir);
     const removedFiles = vi.mocked(fs.rmSync).mock.calls.map(([p]: [unknown, ...unknown[]]) => path.basename(p as string));
     expect(removedFiles).toContain('tsconfig.json');
-    expect(removedFiles).toContain('eslint.config.js');
-    expect(removedFiles).toContain('vitest.config.js');
+    expect(removedFiles).toContain('tsconfig.build.json');
+    expect(removedFiles).toContain('eslint.config.ts');
+    expect(removedFiles).toContain('vitest.config.ts');
     expect(removedFiles).toContain('.ts.config.json');
   });
 
-  it('removes exactly 4 files', () => {
+  it('removes exactly 5 files', () => {
     vi.mocked(fs.rmSync).mockReset();
     rmConfigs(projectDir);
-    expect(vi.mocked(fs.rmSync).mock.calls).toHaveLength(4);
+    expect(vi.mocked(fs.rmSync).mock.calls).toHaveLength(5);
   });
 });

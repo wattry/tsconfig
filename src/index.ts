@@ -13,14 +13,6 @@ import type { LogLevelOption } from './types.js';
 import { tsConfigPath, choices } from './types.js';
 import type { BasePkgJson, Options, Snapshots } from './types.js';
 
-function parseJsonc(text: string): unknown {
-  const stripped = text
-    .replace(/\/\/[^\n]*/g, '')
-    .replace(/\/\*[\s\S]*?\*\//g, '')
-    .replace(/,(\s*[}\]])/g, '$1');
-  return JSON.parse(stripped);
-}
-
 const program = new Command();
 const basePkgJsonString = fs
   .readFileSync(`${tsConfigPath}/package.json`, files.encoding)
@@ -52,6 +44,8 @@ const targetVersionOption = new Option(
   'Target version of @wattry/tsconfig to install (default: latest)',
 );
 
+const importConfig = { with: { type: 'json' } };
+
 pmOption.default(choices[0]);
 pmOption.choices(choices);
 
@@ -61,7 +55,7 @@ program
   .addOption(pmOption)
   .addOption(debug)
   .addOption(verbose)
-  .action(function (options: Options) {
+  .action(async function (options: Options) {
     const level = options?.debug
       ? 'debug'
       : options?.verbose
@@ -87,18 +81,21 @@ program
     dependencies.installDev(basePkgJson, packageManager);
 
     // Capture base config snapshots from the installed package
-    const tsconfigRaw = fs.readFileSync(`${tsConfigPath}/tsconfig.json`, files.encoding).toString();
-    const tsconfigParsed = parseJsonc(tsconfigRaw) as {
+    const tsconfigParsed = await import(`${tsConfigPath}/tsconfig.json`, importConfig) satisfies {
       compilerOptions: Record<string, unknown>;
       include?: string[];
-      exclude?: string[];
+    };
+
+    const tsconfigBuildParsed = await import(`${tsConfigPath}/tsconfig.build.json`, importConfig) satisfies {
+      compilerOptions: Record<string, unknown>;
+      include?: string[];
     };
 
     // Write thin wrapper config files seeded with base tsconfig values
-    files.writeWrappers(projectDir, tsconfigParsed);
+    files.writeWrappers(projectDir, tsconfigParsed.default, tsconfigBuildParsed.default);
 
-    const eslintRaw = fs.readFileSync(`${tsConfigPath}/eslint.config.js`, files.encoding).toString();
-    const vitestRaw = fs.readFileSync(`${tsConfigPath}/vitest.config.js`, files.encoding).toString();
+    const eslintRaw = fs.readFileSync(`${tsConfigPath}/eslint.config.ts`, files.encoding).toString();
+    const vitestRaw = fs.readFileSync(`${tsConfigPath}/vitest.config.ts`, files.encoding).toString();
 
     const snapshots: Snapshots = {
       tsconfig: { compilerOptions: tsconfigParsed.compilerOptions },
@@ -168,7 +165,7 @@ program
   .addOption(targetVersionOption)
   .addOption(debug)
   .addOption(verbose)
-  .action(function (options: Options & { targetVersion?: string }) {
+  .action(async function (options: Options & { targetVersion?: string }) {
     const level = options?.debug ? 'debug' : options?.verbose ? 'verbose' : 'info';
     const logger = Logger(level as LogLevelOption);
 
@@ -183,11 +180,11 @@ program
     ) as { version: string };
 
     // Read new base config snapshots from the freshly installed package
-    const newTsConfig = parseJsonc(
-      fs.readFileSync(`${tsConfigPath}/tsconfig.json`, files.encoding).toString()
-    ) as { compilerOptions?: Record<string, unknown> };
-    const newEslint = fs.readFileSync(`${tsConfigPath}/eslint.config.js`, files.encoding).toString();
-    const newVitest = fs.readFileSync(`${tsConfigPath}/vitest.config.js`, files.encoding).toString();
+    const newTsConfig = await import(`${tsConfigPath}/tsconfig.json`, importConfig) satisfies {
+      compilerOptions: Record<string, unknown>;
+    };
+    const newEslint = fs.readFileSync(`${tsConfigPath}/eslint.config.ts`, files.encoding).toString();
+    const newVitest = fs.readFileSync(`${tsConfigPath}/vitest.config.ts`, files.encoding).toString();
 
     // Show diff before updating the manifest
     const currentManifest = manifestMod.readManifest(projectDir);

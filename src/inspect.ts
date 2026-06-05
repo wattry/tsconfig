@@ -24,8 +24,8 @@ export function inspectConfigs(manifest: Manifest, packageDir: string): InspectR
     fs.readFileSync(path.join(packageDir, 'tsconfig.json'), encoding).toString()
   ) as { compilerOptions?: Record<string, unknown> };
 
-  const currentEslint = readOrEmpty(path.join(packageDir, 'eslint.config.js'));
-  const currentVitest = readOrEmpty(path.join(packageDir, 'vitest.config.js'));
+  const currentEslint = readOrEmpty(path.join(packageDir, 'eslint.config.ts'));
+  const currentVitest = readOrEmpty(path.join(packageDir, 'vitest.config.ts'));
 
   return {
     tsconfig: diffCompilerOptions(
@@ -54,14 +54,14 @@ export function formatInspectResult(result: InspectResult, overrides: Manifest['
   }
 
   if (result.eslint.length > 0) {
-    lines.push('eslint.config.js');
+    lines.push('eslint.config.ts');
     for (const diff of result.eslint) {
       lines.push(`  ${diff.type === 'added' ? '+' : '-'} ${diff.line}`);
     }
   }
 
   if (result.vitest.length > 0) {
-    lines.push('vitest.config.js');
+    lines.push('vitest.config.ts');
     for (const diff of result.vitest) {
       lines.push(`  ${diff.type === 'added' ? '+' : '-'} ${diff.line}`);
     }

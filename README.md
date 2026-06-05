@@ -1,74 +1,110 @@
-# TS Config
+# @wattry/tsconfig
 
-This is an example project that defines how to setup a TS project to export both CS and ESM type modules along with the corresponding TS.
+Shared TypeScript, ESLint, and Vitest configuration for ESM projects — plus a `tsconfig` CLI that scaffolds and maintains those configs in your project.
 
-Start initialize a new npm project as follows replacing '<ts-module>' with your module name.
+It plays two roles:
 
-```shell
+1. A **config package** you extend, via the package `exports`:
+   - `@wattry/tsconfig/base` — base `tsconfig` (`tsconfig.base.json`)
+   - `@wattry/tsconfig/eslint` — `createBaseConfig` for a flat ESLint config
+   - `@wattry/tsconfig/vitest` — base Vitest config
+2. A **CLI** (`tsconfig`) that writes thin wrapper configs into your project, installs the matching dev dependencies, and tracks them in a manifest so you can diff and update later.
+
+The goal is to centralize dev-dependency and config maintenance across many projects so versions stay in step.
+
+## Getting started
+
+```sh
 pnpm init <name>
 pnpm add -D @wattry/tsconfig
 pnpm tsconfig init
 ```
 
-This will initialize a new TS project that will export the source code as esm as well as any typings.
+`init` will:
 
-Create a src directory and start building the module making sure to add an index.ts that should either export all your public functions or the main module that will be run.
+- create `src/` and `types/` directories
+- merge `package.json` (scripts, and `type`/`license` if unset)
+- install the base dev dependencies with your package manager
+- write wrapper configs that extend the base: `tsconfig.json`, `tsconfig.build.json`, `eslint.config.ts`, `vitest.config.ts`
+- write a `.ts.config.json` manifest pinning the base version and config snapshots
 
-When you're finished you can simply run:
+Add an `index.ts` to `src/` that exports your public API (or the entry point you run), then build:
 
-```shell
-pnpm build
-
+```sh
+pnpm build      # tsc → dist/ (ESM + .d.ts typings)
 pnpm publish
 ```
 
-If your access token is configured correctly your module and it's typings will be published. If this code is not a public module then you can just execute the code right from the dist folder.
-
-# Maintaining
-
-The central concept of the project is to centralize maintenance of development dependencies for a collection of projects. Hence ensuring this is upgraded and
-updated in order to keep versions in step.
+## CLI commands
 
 ```sh
-pnpm upgrade:all
+tsconfig init      # scaffold configs, install deps, write manifest
+tsconfig update    # bump @wattry/tsconfig, reinstall deps, show config diff
+tsconfig inspect   # diff pinned manifest snapshot against the installed base config
+tsconfig reset     # uninstall base deps and remove the wrapper configs + manifest
+
+tsconfig override add <config> <key> --reason <text>   # document an intentional deviation
+tsconfig override list
+tsconfig override remove <config> <key>
 ```
 
-# Contributing
+Common flags: `-p, --package-manager <pnpm|npm|yarn>` (default `pnpm`), `-d, --debug`, `--verbose`.
+`update` also takes `--target-version <string>` (default `latest`).
 
-## Install
+## Extending the base configs
 
-```shell
-pnpm install -g .
+ESLint (`eslint.config.ts`):
+
+```ts
+import { defineConfig } from 'eslint/config';
+import { createBaseConfig } from '@wattry/tsconfig/eslint';
+
+const files = ['**/*.ts'];
+const ignores = ['dist/**/*', 'node_modules/**/*'];
+
+// Add your own config object alongside the base to override:
+// const customConfig = { /* ... */ };
+// export default defineConfig([createBaseConfig(import.meta, { files, ignores }), customConfig]);
+
+export default defineConfig(
+  createBaseConfig(import.meta, { files, ignores })
+);
 ```
 
-## Build
+Vitest (`vitest.config.ts`):
 
-This will output a dist directory that will contain esm and types directories respectively.
-In the importing project you'll need to specify the type property in the package.json. Either "commonjs" or "module".
-When you install this module the project will reference the correct source based on this flag.
+```ts
+import base from '@wattry/tsconfig/vitest';
 
-This projects uses tsup in order to correctly adjust the import paths for esm to use .mjs. Remember that in cjs projects using NodeJS v20+ you can import mjs modules in cjs code using the dynamic import. However, this import is async so you cannot do it at the top of your projects.
-
-esm-js.mjs
-
-```mjs
-export myFunction(abc, zyx) {
-  console.log('Hello World!', abc, zyx);
-}
+// export default { ...base, /* project-level overrides */ };
+export default base;
 ```
 
-With this in mind you can build this project.
+## Maintaining
 
-```shell
-pnpm build
+Keep this package upgraded so every consuming project stays on matching tool versions:
+
+```sh
+pnpm upgrade:all   # pnpm update --latest
 ```
 
-## Run
+In a consuming project, run `tsconfig update` to bump the base, reinstall deps, and review the config diff before it updates the pinned manifest.
 
-### TS
+## Contributing
 
-This uses ts-node to run the TS on the fly.
+Requires Node `^24` and pnpm.
 
-```shell
-pnpm start
+```sh
+pnpm install
+pnpm build        # clean + tsc --project tsconfig.build.json → dist/
+pnpm dev          # tsx watch on src/index.ts
+pnpm typecheck    # tsc --noEmit --project tsconfig.json
+pnpm lint         # eslint --config eslint.config.ts src/**/*.ts
+pnpm test         # vitest (__tests__/**/*.test.ts)
 ```
+
+The package is built with plain `tsc`, emitting ESM and `.d.ts` typings to `dist/`. A Husky `pre-commit` hook runs `lint` and `typecheck`. Publishing is automated by GitHub Actions on push to `main` when `package.json`'s `version` changes.
+
+## License
+
+Apache-2.0

@@ -1,11 +1,18 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import stylistic from '@stylistic/eslint-plugin';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
+import type { ConfigWithExtendsArray } from '@eslint/config-helpers';
+
+export interface EslintBaseOptions {
+  ignores: string[];
+  files: string[];
+}
 
 export function createBaseConfig(
-  dirname,
-  options = {}
-) {
+  importMeta: ImportMeta,
+  options: EslintBaseOptions = { ignores: [], files: [] }
+): ConfigWithExtendsArray {
   const { ignores = [], files = [] } = options;
 
   return [
@@ -21,7 +28,7 @@ export function createBaseConfig(
             globals: globals.node,
             parserOptions: {
               projectService: true,
-              tsconfigRootDir: dirname,
+              tsconfigRootDir: importMeta.dirname,
               defaultProject: 'tsconfig.json',
             },
           },
@@ -91,9 +98,11 @@ export function createBaseConfig(
               { selector: 'default', format: ['camelCase', 'UPPER_CASE'] },
               { selector: 'import', format: null },
               { selector: 'variable', format: ['camelCase', 'UPPER_CASE'], leadingUnderscore: 'allowDouble' },
+              { selector: 'variable', filter: { regex: '(Schema|Query|Params|Body|Response|Contract|Dto|Input|Payload|Config|Options)$', match: true }, format: ['PascalCase'] },
               { selector: 'parameter', format: ['camelCase'], leadingUnderscore: 'allow' },
               { selector: 'function', format: ['camelCase', 'PascalCase'] },
-              { selector: 'objectLiteralProperty', format: ['camelCase', 'PascalCase', 'UPPER_CASE', 'snake_case'], leadingUnderscore: 'allowDouble' },
+              { selector: 'objectLiteralProperty', filter: { regex: '^[0-9]+$', match: true }, format: null },
+              { selector: 'objectLiteralProperty', filter: { regex: '^[0-9]+$', match: false }, format: ['camelCase', 'PascalCase', 'UPPER_CASE', 'snake_case'], leadingUnderscore: 'allowDouble' },
               { selector: 'typeLike', format: ['PascalCase'] },
               { selector: 'enumMember', format: ['UPPER_CASE', 'camelCase'] },
             ],

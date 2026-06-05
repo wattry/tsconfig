@@ -42,7 +42,7 @@ describe('inspectConfigs', () => {
       if ((p as string).endsWith('tsconfig.json')) {
         return JSON.stringify({ compilerOptions: { strict: true, target: 'ES2020' } });
       }
-      if ((p as string).endsWith('eslint.config.js')) return manifest.snapshots.eslint;
+      if ((p as string).endsWith('eslint.config.ts')) return manifest.snapshots.eslint;
       return manifest.snapshots.vitest;
     });
 

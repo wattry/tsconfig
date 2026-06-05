@@ -11,26 +11,26 @@ class CLogger {
   }
 
   error(...args: unknown[]) {
-    globalThis.console.error(this.name, ...args);
+    console.error(this.name, ...args);
   }
 
   warn(...args: unknown[]) {
-    globalThis.console.warn(this.name, ...args);
+    console.warn(this.name, ...args);
   }
 
   info(...args: unknown[]) {
-    globalThis.console.info(this.name, ...args);
+    console.info(this.name, ...args);
   }
 
   debug(...args: unknown[]) {
     if (this.level > 2) {
-      globalThis.console.debug(this.name, ...args);
+      console.debug(this.name, ...args);
     }
   }
 
   trace(...args: unknown[]) {
     if (this.level > 3) {
-      globalThis.console.trace(this.name, ...args);
+      console.trace(this.name, ...args);
     }
   }
 }

@@ -8,39 +8,68 @@ import type { BasePkgJson, PkgJson, ConfigMap } from './types.js';
 export const rmOptions = { recursive: true, force: true };
 export const encoding: EncodingOption = { encoding: 'utf8' };
 
-const ESLINT_WRAPPER = `import base from '@wattry/tsconfig/eslint.config.js';
+const ESLINT_WRAPPER = `import { defineConfig } from 'eslint/config';
+import { createBaseConfig } from '@wattry/tsconfig/eslint';
 
-export default [
-  ...base,
-  {
-    // Project-level overrides go here
-  },
-];
+const files = ['**/*.ts'];
+const ignores = ['dist/**/*', 'node_modules/**/*'];
+
+/**
+ * You can override the base config like so
+ * const customConfig = <your custom config>;
+ * export default defineConfig(
+ *   [createBaseConfig(import.meta, { files, ignores }), customConfig]
+ * );
+ */
+
+export default defineConfig(
+  createBaseConfig(import.meta, { files, ignores })
+);
 `;
 
-const VITEST_WRAPPER = `import base from '@wattry/tsconfig/vitest.config.js';
+const VITEST_WRAPPER = `import base from '@wattry/tsconfig/vitest';
 
-export default {
-  ...base,
-  // Project-level overrides go here
-};
+/**
+ * To extend this config adjust it as follows
+ *
+ * export default {
+ *   ...base,
+ *   // Project-level overrides go here
+ * };
+ */
+
+export default base;
 `;
 
 export function writeWrappers(
   projectDir: string,
   baseTsConfig: { compilerOptions: Record<string, unknown>; include?: string[]; exclude?: string[] },
+  buildTsConfig: { compilerOptions: Record<string, unknown>; include?: string[] },
 ): void {
-  const { typeRoots, rootDir, baseUrl, outDir } = baseTsConfig.compilerOptions;
+  const { typeRoots, rootDir, outDir } = baseTsConfig.compilerOptions;
   const tsconfigWrapper = JSON.stringify(
     {
-      extends: '@wattry/tsconfig/tsconfig.json',
+      extends: '@wattry/tsconfig/base',
       ...(baseTsConfig.include && { include: baseTsConfig.include }),
       ...(baseTsConfig.exclude && { exclude: baseTsConfig.exclude }),
       compilerOptions: {
         ...(typeRoots !== undefined && { typeRoots }),
         ...(rootDir !== undefined && { rootDir }),
-        ...(baseUrl !== undefined && { baseUrl }),
         ...(outDir !== undefined && { outDir }),
+      },
+    },
+    null,
+    2,
+  );
+
+  const { rootDir: buildRootDir, outDir: buildOutDir } = buildTsConfig.compilerOptions;
+  const tsconfigBuildWrapper = JSON.stringify(
+    {
+      extends: './tsconfig.json',
+      ...(buildTsConfig.include && { include: buildTsConfig.include }),
+      compilerOptions: {
+        ...(buildRootDir !== undefined && { rootDir: buildRootDir }),
+        ...(buildOutDir !== undefined && { outDir: buildOutDir }),
       },
     },
     null,
@@ -49,12 +78,18 @@ export function writeWrappers(
 
   logger.info('Writing wrapper configs');
   fs.writeFileSync(path.join(projectDir, 'tsconfig.json'), tsconfigWrapper);
-  fs.writeFileSync(path.join(projectDir, 'eslint.config.js'), ESLINT_WRAPPER);
-  fs.writeFileSync(path.join(projectDir, 'vitest.config.js'), VITEST_WRAPPER);
+  fs.writeFileSync(path.join(projectDir, 'tsconfig.build.json'), tsconfigBuildWrapper);
+  fs.writeFileSync(path.join(projectDir, 'eslint.config.ts'), ESLINT_WRAPPER);
+  fs.writeFileSync(path.join(projectDir, 'vitest.config.ts'), VITEST_WRAPPER);
   logger.info('Wrote wrapper configs');
 }
 
-export function configurePkgJson(projectDir: string, basePkgJson: BasePkgJson, configs: ConfigMap, overwriteScripts = false): void {
+export function configurePkgJson(
+  projectDir: string,
+  basePkgJson: BasePkgJson,
+  configs: ConfigMap,
+  overwriteScripts = false
+): void {
   logger.info('Configure package.json');
 
   const pkgJson: PkgJson = JSON.parse(
@@ -101,7 +136,7 @@ export function mkDirectories(name: string): void {
 
 export function rmConfigs(projectDir: string): void {
   logger.info('Removing wrapper configs');
-  for (const file of ['tsconfig.json', 'eslint.config.js', 'vitest.config.js', '.ts.config.json']) {
+  for (const file of ['tsconfig.json', 'tsconfig.build.json', 'eslint.config.ts', 'vitest.config.ts', '.ts.config.json']) {
     try {
       fs.rmSync(path.join(projectDir, file), rmOptions);
     } catch (error: unknown) {

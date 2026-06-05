@@ -1,4 +1,4 @@
-name: pr-version-check
+name: pr
 
 on:
   pull_request:

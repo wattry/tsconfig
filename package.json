@@ -4,6 +4,8 @@
   "version": "0.4.2",
   "type": "module",
   "author": "wattry",
+  "private": "false",
+  "repository": "https://github.com/wattry/tsconfig",
   "license": "Apache-2.0",
   "keywords": [
     "Typescript",

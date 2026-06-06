@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.4.3](https://github.com/wattry/tsconfig/compare/tsconfig-v0.4.2...tsconfig-v0.4.3) (2026-06-06)
+
+
+### Bug Fixes
+
+* update package.json ([a39ea15](https://github.com/wattry/tsconfig/commit/a39ea156e2e8076edcdef8c32448cc15478a938f))
+* update package.json ([55729e2](https://github.com/wattry/tsconfig/commit/55729e292f8d0517917b4f4f5ade0c10966b90a8))
+
 ## [0.4.2](https://github.com/wattry/tsconfig/compare/tsconfig-v0.4.1...tsconfig-v0.4.2) (2026-06-05)
 
 

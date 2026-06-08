@@ -41,11 +41,12 @@
     "./base": "./tsconfig.base.json",
     "./eslint": {
       "types": "./types/eslint.base.d.ts",
-      "default": "./eslint.base.js"
+      "default": "./eslint.base.ts"
     },
+    "./vitest/base": "./vitest.config.base.ts",
     "./vitest": {
       "types": "./types/vitest.config.d.ts",
-      "default": "./vitest.config.js"
+      "default": "./vitest.config.ts"
     }
   },
   "dependencies": {
@@ -59,6 +60,7 @@
     "tsconfig.json",
     "tsconfig.base.json",
     "tsconfig.build.json",
+    "vitest.config.base.ts",
     "vitest.config.ts"
   ],
   "devDependencies": {
@@ -71,7 +73,7 @@
     "eslint": "10.4.1",
     "globals": "17.6.0",
     "husky": "9.1.7",
-    "jiti": "^2.7.0",
+    "jiti": "2.7.0",
     "tsx": "4.22.4",
     "typescript": "6.0.3",
     "typescript-eslint": "8.60.1",

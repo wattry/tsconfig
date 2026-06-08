@@ -1,8 +1,6 @@
 import { defineConfig } from 'vitest/config';
+import { getConfig } from '@wattry/tsconfig/vitest/base';
 
 export default defineConfig({
-  test: {
-    exclude: [],
-    include: ['__tests__/**/*.{test,spec}.{ts,js}', 'test/**/*.{test,spec}.{ts,js}']
-  },
+  test: getConfig(),
 });

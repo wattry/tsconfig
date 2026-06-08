@@ -15,8 +15,19 @@ export function installDev(
   const installCMD = `${packageManager} ${installCmd} ${packages}`;
 
   logger.info('Installing dev dependencies:', installCMD);
-  child.execSync(installCMD);
-  logger.info('Installed dev dependencies');
+  try {
+    child.execSync(installCMD);
+    logger.info('Installed dev dependencies');
+  } catch (error: unknown) {
+    const e = error as Error;
+
+    // If there is an error let's trying installing them on by one.
+    for (const [pkg, version] of devDependencies) {
+      child.execSync(`${pkg}@${version}`);
+    }
+
+    logger.error('An error occurred installing dev dependencies', e.message, e.stack);
+  }
 }
 
 export function uninstallDev(

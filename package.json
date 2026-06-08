@@ -1,7 +1,7 @@
 {
   "name": "@wattry/tsconfig",
   "description": "Base config for bootstrapping and maintaining Typescript projects",
-  "version": "0.4.3",
+  "version": "0.4.4",
   "type": "module",
   "author": "wattry",
   "repository": "https://github.com/wattry/tsconfig",

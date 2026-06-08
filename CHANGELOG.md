@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.4.4](https://github.com/wattry/tsconfig/compare/tsconfig-v0.4.3...tsconfig-v0.4.4) (2026-06-08)
+
+
+### Bug Fixes
+
+* adjust configs to bump version ([edbbc15](https://github.com/wattry/tsconfig/commit/edbbc15ea03959f90057b120392e6703090daa81))
+* adjust configs to bump version ([deab579](https://github.com/wattry/tsconfig/commit/deab579cc677a6a44c39d582c8a9c35dd763b45c))
+
 ## [0.4.3](https://github.com/wattry/tsconfig/compare/tsconfig-v0.4.2...tsconfig-v0.4.3) (2026-06-06)
 
 
